@@ -1,21 +1,29 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Sidebar from '@/components/Sidebar';
 import Header from '@/components/Header';
 import ChartCard from '@/components/ChartCard';
 import { Download, Calendar } from 'lucide-react';
-import { mockBeacons, generateMockMetrics } from '@/lib/mockData';
+import { generateMockMetrics } from '@/lib/mockData';
+import { useBeacons } from '@/lib/useBeacons';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 
 export default function HistoryPage() {
-  const [selectedBeacon, setSelectedBeacon] = useState(mockBeacons[0].id);
+  const { beacons, error } = useBeacons();
+  const [selectedBeacon, setSelectedBeacon] = useState('');
   const [selectedMetric, setSelectedMetric] = useState('battery_level');
   const [dateRange, setDateRange] = useState('30');
   const [chartType, setChartType] = useState<'line' | 'area' | 'bar'>('line');
 
-  const beacon = mockBeacons.find((b) => b.id === selectedBeacon);
+  useEffect(() => {
+    if (!selectedBeacon && beacons.length > 0) {
+      setSelectedBeacon(beacons[0].id);
+    }
+  }, [beacons, selectedBeacon]);
+
+  const beacon = beacons.find((b) => b.id === selectedBeacon);
   const metrics = generateMockMetrics(selectedBeacon, parseInt(dateRange));
 
   const chartData = metrics.map((m) => ({
@@ -75,7 +83,7 @@ export default function HistoryPage() {
                   onChange={(e) => setSelectedBeacon(e.target.value)}
                   className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 >
-                  {mockBeacons.map((beacon) => (
+                  {beacons.map((beacon) => (
                     <option key={beacon.id} value={beacon.id}>
                       {beacon.name}
                     </option>
@@ -142,6 +150,12 @@ export default function HistoryPage() {
               </div>
             </div>
           </div>
+
+          {error && (
+            <div className="mb-6 bg-yellow-50 border border-yellow-200 text-yellow-800 rounded-lg p-4">
+              {error}
+            </div>
+          )}
 
           {beacon && (
             <div className="bg-white border border-slate-200 rounded-lg shadow-sm p-6 mb-6">

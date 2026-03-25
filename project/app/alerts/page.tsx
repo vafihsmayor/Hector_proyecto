@@ -1,17 +1,25 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import Sidebar from '@/components/Sidebar';
 import Header from '@/components/Header';
 import AlertCard from '@/components/AlertCard';
 import DataTable from '@/components/DataTable';
 import { ListFilter as Filter, CircleCheck as CheckCircle, Circle as XCircle } from 'lucide-react';
-import { mockAlerts, mockBeacons } from '@/lib/mockData';
+import { mockAlerts } from '@/lib/mockData';
+import { useBeacons } from '@/lib/useBeacons';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 
 export default function AlertsPage() {
+  const { beacons, error } = useBeacons();
   const [priorityFilter, setPriorityFilter] = useState<string>('all');
+    const beaconById = useMemo(() => {
+      const map = new Map<string, string>();
+      beacons.forEach((beacon) => map.set(beacon.id, beacon.name));
+      return map;
+    }, [beacons]);
+
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [viewMode, setViewMode] = useState<'cards' | 'table'>('cards');
 
@@ -75,8 +83,7 @@ export default function AlertsPage() {
       key: 'beacon_id',
       label: 'Dispositivo',
       render: (value: string) => {
-        const beacon = mockBeacons.find((b) => b.id === value);
-        return <span className="text-sm text-slate-700">{beacon?.name || 'Desconocido'}</span>;
+        return <span className="text-sm text-slate-700">{beaconById.get(value) || 'Desconocido'}</span>;
       },
     },
     {
@@ -236,17 +243,22 @@ export default function AlertsPage() {
             </div>
           </div>
 
+          {error && (
+            <div className="mb-6 bg-yellow-50 border border-yellow-200 text-yellow-800 rounded-lg p-4">
+              {error}
+            </div>
+          )}
+
           {viewMode === 'cards' ? (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {filteredAlerts.map((alert) => {
-                const beacon = mockBeacons.find((b) => b.id === alert.beacon_id);
                 return (
                   <AlertCard
                     key={alert.id}
                     type={alert.type}
                     priority={alert.priority}
                     message={alert.message}
-                    deviceName={beacon?.name || 'Dispositivo desconocido'}
+                    deviceName={beaconById.get(alert.beacon_id) || 'Dispositivo desconocido'}
                     timestamp={alert.created_at}
                     status={alert.status}
                   />

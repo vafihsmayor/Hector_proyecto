@@ -1,30 +1,51 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import Sidebar from '@/components/Sidebar';
 import Header from '@/components/Header';
 import DataTable from '@/components/DataTable';
 import StatusBadge from '@/components/StatusBadge';
 import { Plus, Search, Eye, CreditCard as Edit, Trash2 } from 'lucide-react';
-import { mockBeacons } from '@/lib/mockData';
+import type { Beacon } from '@/lib/types';
+import { getBeacons } from '@/lib/api';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 import Link from 'next/link';
 
 export default function DevicesPage() {
+  const [beacons, setBeacons] = useState<Beacon[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
 
-  const filteredBeacons = mockBeacons.filter((beacon) => {
+  useEffect(() => {
+    const loadBeacons = async () => {
+      setIsLoading(true);
+      setError('');
+      try {
+        const data = await getBeacons();
+        setBeacons(data);
+      } catch (err: any) {
+        setError(err?.message || 'No se pudo cargar la lista de beacons');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadBeacons();
+  }, []);
+
+  const filteredBeacons = useMemo(() => beacons.filter((beacon) => {
     const matchesSearch =
       beacon.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       beacon.device_id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      beacon.location.toLowerCase().includes(searchTerm.toLowerCase());
+      (beacon.location || '').toLowerCase().includes(searchTerm.toLowerCase());
 
     const matchesStatus = statusFilter === 'all' || beacon.status === statusFilter;
 
     return matchesSearch && matchesStatus;
-  });
+  }), [beacons, searchTerm, statusFilter]);
 
   const columns = [
     {
@@ -132,30 +153,40 @@ export default function DevicesPage() {
             </div>
           </div>
 
+          {error && (
+            <div className="mb-6 bg-red-50 border border-red-200 text-red-800 rounded-lg p-4">
+              {error}
+            </div>
+          )}
+
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
             <div className="bg-white border border-slate-200 rounded-lg p-4">
               <p className="text-sm text-slate-600 mb-1">Total Dispositivos</p>
-              <p className="text-2xl font-bold text-slate-900">{mockBeacons.length}</p>
+              <p className="text-2xl font-bold text-slate-900">{beacons.length}</p>
             </div>
             <div className="bg-white border border-green-200 rounded-lg p-4 bg-green-50">
               <p className="text-sm text-green-700 mb-1">Activos</p>
               <p className="text-2xl font-bold text-green-700">
-                {mockBeacons.filter((b) => b.status === 'active').length}
+                {beacons.filter((b) => b.status === 'active').length}
               </p>
             </div>
             <div className="bg-white border border-slate-200 rounded-lg p-4 bg-slate-50">
               <p className="text-sm text-slate-700 mb-1">Inactivos</p>
               <p className="text-2xl font-bold text-slate-700">
-                {mockBeacons.filter((b) => b.status === 'inactive').length}
+                {beacons.filter((b) => b.status === 'inactive').length}
               </p>
             </div>
             <div className="bg-white border border-red-200 rounded-lg p-4 bg-red-50">
               <p className="text-sm text-red-700 mb-1">Desconectados</p>
               <p className="text-2xl font-bold text-red-700">
-                {mockBeacons.filter((b) => b.status === 'disconnected').length}
+                {beacons.filter((b) => b.status === 'disconnected').length}
               </p>
             </div>
           </div>
+
+          {isLoading && (
+            <div className="mb-6 text-slate-600">Cargando dispositivos desde backend...</div>
+          )}
 
           <DataTable
             columns={columns}

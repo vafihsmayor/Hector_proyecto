@@ -4,11 +4,12 @@ import React, { useState } from 'react';
 import Sidebar from '@/components/Sidebar';
 import Header from '@/components/Header';
 import { FileText, Download, Calendar } from 'lucide-react';
-import { mockBeacons } from '@/lib/mockData';
+import { useBeacons } from '@/lib/useBeacons';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 
 export default function ReportsPage() {
+  const { beacons, error } = useBeacons();
   const [reportType, setReportType] = useState('comprehensive');
   const [selectedBeacon, setSelectedBeacon] = useState('all');
   const [startDate, setStartDate] = useState(
@@ -30,7 +31,7 @@ export default function ReportsPage() {
 
     setTimeout(() => {
       const reportName = reportTypes.find((r) => r.id === reportType)?.name || 'Reporte';
-      const beaconName = selectedBeacon === 'all' ? 'Todos' : mockBeacons.find((b) => b.id === selectedBeacon)?.name;
+      const beaconName = selectedBeacon === 'all' ? 'Todos' : beacons.find((b) => b.id === selectedBeacon)?.name;
       const fileName = `${reportName}_${beaconName}_${format(new Date(), 'yyyyMMdd')}.${fileType}`;
 
       alert(
@@ -94,7 +95,7 @@ export default function ReportsPage() {
                       className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50"
                     >
                       <option value="all">Todos los dispositivos</option>
-                      {mockBeacons.map((beacon) => (
+                      {beacons.map((beacon) => (
                         <option key={beacon.id} value={beacon.id}>
                           {beacon.name} ({beacon.device_id})
                         </option>
@@ -162,6 +163,12 @@ export default function ReportsPage() {
                   </div>
                 </div>
               </div>
+
+              {error && (
+                <div className="mb-6 bg-yellow-50 border border-yellow-200 text-yellow-800 rounded-lg p-4">
+                  {error}
+                </div>
+              )}
 
               <div className="bg-white border border-slate-200 rounded-lg shadow-sm p-6">
                 <h3 className="text-lg font-semibold text-slate-800 mb-4">
@@ -267,8 +274,8 @@ export default function ReportsPage() {
                     <p className="text-sm text-slate-600">Dispositivos</p>
                     <p className="text-base font-semibold text-slate-900">
                       {selectedBeacon === 'all'
-                        ? `Todos (${mockBeacons.length})`
-                        : mockBeacons.find((b) => b.id === selectedBeacon)?.name}
+                        ? `Todos (${beacons.length})`
+                        : beacons.find((b) => b.id === selectedBeacon)?.name}
                     </p>
                   </div>
                 </div>

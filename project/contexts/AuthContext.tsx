@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { loginRequest } from '@/lib/api';
 
 interface User {
   id: string;
@@ -37,30 +38,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const login = async (username: string, password: string) => {
     try {
-      const response = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ username, password }),
-      });
+      const response = await loginRequest(username, password);
+      const authUser: User = {
+        id: response.user.id,
+        username: response.user.username,
+        email: response.user.email,
+        role: response.user.role,
+      };
 
-      const data = await response.json();
+      localStorage.setItem('user', JSON.stringify(authUser));
+      localStorage.setItem('token', response.token);
 
-      if (!response.ok) {
-        throw new Error(data.error || 'Credenciales inválidas');
-      }
-
-      const { user, token } = data;
-
-      localStorage.setItem('user', JSON.stringify(user));
-      localStorage.setItem('token', token);
-
-      setUser(user);
+      setUser(authUser);
       router.push('/dashboard');
     } catch (error: any) {
-      console.error('Login error:', error);
-      throw error;
+      throw new Error(error?.message || 'Credenciales invalidas');
     }
   };
 

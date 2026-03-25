@@ -1,12 +1,12 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Sidebar from '@/components/Sidebar';
 import Header from '@/components/Header';
 import KPICard from '@/components/KPICard';
 import ChartCard from '@/components/ChartCard';
 import { Play, RefreshCw, TriangleAlert as AlertTriangle, Battery, Activity, Radio } from 'lucide-react';
-import { mockBeacons } from '@/lib/mockData';
+import { useBeacons } from '@/lib/useBeacons';
 
 interface SimulationResult {
   scenario: string;
@@ -19,10 +19,17 @@ interface SimulationResult {
 }
 
 export default function SimulationPage() {
-  const [selectedBeacon, setSelectedBeacon] = useState(mockBeacons[0].id);
+  const { beacons, error } = useBeacons();
+  const [selectedBeacon, setSelectedBeacon] = useState('');
   const [selectedScenario, setSelectedScenario] = useState('battery_50');
   const [isRunning, setIsRunning] = useState(false);
   const [result, setResult] = useState<SimulationResult | null>(null);
+
+  useEffect(() => {
+    if (!selectedBeacon && beacons.length > 0) {
+      setSelectedBeacon(beacons[0].id);
+    }
+  }, [beacons, selectedBeacon]);
 
   const scenarios = [
     { id: 'battery_50', name: 'Batería al 50%', description: 'Simula el dispositivo con batería media' },
@@ -138,7 +145,7 @@ export default function SimulationPage() {
     setResult(null);
   };
 
-  const beacon = mockBeacons.find((b) => b.id === selectedBeacon);
+  const beacon = beacons.find((b) => b.id === selectedBeacon);
 
   const simulationChartData = result
     ? Array.from({ length: 30 }, (_, i) => ({
@@ -176,7 +183,7 @@ export default function SimulationPage() {
                   disabled={isRunning}
                   className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50"
                 >
-                  {mockBeacons.map((beacon) => (
+                  {beacons.map((beacon) => (
                     <option key={beacon.id} value={beacon.id}>
                       {beacon.name}
                     </option>
@@ -232,6 +239,12 @@ export default function SimulationPage() {
                 </div>
               </div>
             </div>
+
+            {error && (
+              <div className="mt-4 bg-yellow-50 border border-yellow-200 text-yellow-800 rounded-lg p-4">
+                {error}
+              </div>
+            )}
 
             {beacon && (
               <div className="mt-4 p-4 bg-slate-50 rounded-lg">

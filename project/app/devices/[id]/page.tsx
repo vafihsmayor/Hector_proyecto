@@ -9,23 +9,45 @@ import ChartCard from '@/components/ChartCard';
 import KPICard from '@/components/KPICard';
 import { ArrowLeft, Radio, MapPin, Calendar, Battery, Signal, Thermometer, Clock, TriangleAlert as AlertTriangle } from 'lucide-react';
 import Link from 'next/link';
-import { mockBeacons, generateMockMetrics, mockAlerts, mockPredictions } from '@/lib/mockData';
+import { mockAlerts, mockPredictions } from '@/lib/mockData';
+import { getBeaconMetrics } from '@/lib/api';
+import { useBeacons } from '@/lib/useBeacons';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 
 export default function DeviceDetailPage() {
   const params = useParams();
   const beaconId = params.id as string;
-  const beacon = mockBeacons.find((b) => b.id === beaconId);
+  const { beacons } = useBeacons();
+  const beacon = beacons.find((b) => b.id === beaconId);
 
   const [metrics, setMetrics] = useState<any[]>([]);
 
   useEffect(() => {
-    if (beacon) {
-      const beaconMetrics = generateMockMetrics(beacon.id, 30);
-      setMetrics(beaconMetrics);
-    }
-  }, [beacon]);
+    const loadMetrics = async () => {
+      if (!beaconId) {
+        return;
+      }
+
+      try {
+        const beaconMetrics = await getBeaconMetrics(beaconId, 30);
+        const orderedAsc = [...beaconMetrics].reverse();
+        setMetrics(
+          orderedAsc.map((item) => ({
+            ...item,
+            battery_level: Number(item.battery_level ?? 0),
+            signal_strength: Number(item.signal_strength ?? 0),
+            temperature: 25,
+            usage_time: 0,
+          }))
+        );
+      } catch {
+        setMetrics([]);
+      }
+    };
+
+    loadMetrics();
+  }, [beaconId]);
 
   if (!beacon) {
     return (
@@ -109,7 +131,9 @@ export default function DeviceDetailPage() {
                 <p className="text-sm font-medium text-slate-600">Fecha de Registro</p>
               </div>
               <p className="text-base font-semibold text-slate-900">
-                {format(new Date(beacon.enrolled_at), 'dd/MM/yyyy', { locale: es })}
+                {beacon.enrolled_at
+                  ? format(new Date(beacon.enrolled_at), 'dd/MM/yyyy', { locale: es })
+                  : 'N/A'}
               </p>
             </div>
 
@@ -119,7 +143,9 @@ export default function DeviceDetailPage() {
                 <p className="text-sm font-medium text-slate-600">Última Conexión</p>
               </div>
               <p className="text-base font-semibold text-slate-900">
-                {format(new Date(beacon.last_seen), 'dd/MM/yyyy HH:mm', { locale: es })}
+                {beacon.last_seen
+                  ? format(new Date(beacon.last_seen), 'dd/MM/yyyy HH:mm', { locale: es })
+                  : 'N/A'}
               </p>
             </div>
           </div>

@@ -7,8 +7,9 @@ import KPICard from '@/components/KPICard';
 import ChartCard from '@/components/ChartCard';
 import AlertCard from '@/components/AlertCard';
 import { Battery, Radio, Activity, TriangleAlert as AlertTriangle, TrendingUp, Clock } from 'lucide-react';
+import { getBeacons, getDashboardSummary, type DashboardSummary } from '@/lib/api';
+import type { Beacon } from '@/lib/types';
 import {
-  mockBeacons,
   mockAlerts,
   mockPredictions,
   generateBatteryChartData,
@@ -17,30 +18,47 @@ import {
 } from '@/lib/mockData';
 
 export default function DashboardPage() {
+  const [beacons, setBeacons] = useState<Beacon[]>([]);
+  const [summary, setSummary] = useState<DashboardSummary | null>(null);
+  const [apiError, setApiError] = useState('');
   const [batteryData, setBatteryData] = useState<any[]>([]);
   const [signalData, setSignalData] = useState<any[]>([]);
   const [usageData, setUsageData] = useState<any[]>([]);
 
   useEffect(() => {
-    setBatteryData(generateBatteryChartData(30));
-    setSignalData(generateSignalChartData(30));
-    setUsageData(generateUsageChartData(30));
+    const loadData = async () => {
+      setApiError('');
+      try {
+        const [summaryResponse, beaconsResponse] = await Promise.all([
+          getDashboardSummary(),
+          getBeacons(),
+        ]);
+        setSummary(summaryResponse);
+        setBeacons(beaconsResponse);
+      } catch (err: any) {
+        setApiError(err?.message || 'No se pudo cargar el resumen del dashboard');
+      }
+
+      setBatteryData(generateBatteryChartData(30));
+      setSignalData(generateSignalChartData(30));
+      setUsageData(generateUsageChartData(30));
+    };
+
+    loadData();
   }, []);
 
-  const activeBeacons = mockBeacons.filter((b) => b.status === 'active').length;
-  const inactiveBeacons = mockBeacons.filter((b) => b.status === 'inactive').length;
-  const disconnectedBeacons = mockBeacons.filter((b) => b.status === 'disconnected').length;
+  const activeBeacons = summary?.active_beacons ?? beacons.filter((b) => b.status === 'active').length;
+  const inactiveBeacons = summary?.inactive_beacons ?? beacons.filter((b) => b.status === 'inactive').length;
+  const disconnectedBeacons =
+    summary?.disconnected_beacons ?? beacons.filter((b) => b.status === 'disconnected').length;
+  const totalBeacons = summary?.total_beacons ?? beacons.length;
 
   const activeAlerts = mockAlerts.filter((a) => a.status === 'active').length;
   const criticalAlerts = mockAlerts.filter(
     (a) => a.status === 'active' && a.priority === 'critical'
   ).length;
 
-  const avgBattery =
-    mockBeacons.reduce((acc, beacon) => {
-      const latestMetric = batteryData[batteryData.length - 1];
-      return acc + (latestMetric?.battery || 75);
-    }, 0) / mockBeacons.length;
+  const avgBattery = summary?.avg_battery ?? 0;
 
   const highRiskDevices = mockPredictions.filter(
     (p) => p.risk_level === 'high' || p.risk_level === 'critical'
@@ -65,7 +83,7 @@ export default function DashboardPage() {
               value={activeBeacons}
               icon={Radio}
               status="success"
-              subtitle={`${mockBeacons.length} dispositivos totales`}
+              subtitle={`${totalBeacons} dispositivos totales`}
             />
 
             <KPICard
@@ -94,6 +112,12 @@ export default function DashboardPage() {
             />
           </div>
 
+          {apiError && (
+            <div className="mb-6 bg-red-50 border border-red-200 text-red-800 rounded-lg p-4">
+              {apiError}
+            </div>
+          )}
+
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
             <div className="lg:col-span-2">
               <ChartCard
@@ -121,7 +145,7 @@ export default function DashboardPage() {
                     <div className="w-full bg-slate-100 rounded-full h-2">
                       <div
                         className="bg-green-500 h-2 rounded-full"
-                        style={{ width: `${(activeBeacons / mockBeacons.length) * 100}%` }}
+                        style={{ width: `${totalBeacons ? (activeBeacons / totalBeacons) * 100 : 0}%` }}
                       ></div>
                     </div>
                   </div>
@@ -134,7 +158,7 @@ export default function DashboardPage() {
                     <div className="w-full bg-slate-100 rounded-full h-2">
                       <div
                         className="bg-slate-400 h-2 rounded-full"
-                        style={{ width: `${(inactiveBeacons / mockBeacons.length) * 100}%` }}
+                        style={{ width: `${totalBeacons ? (inactiveBeacons / totalBeacons) * 100 : 0}%` }}
                       ></div>
                     </div>
                   </div>
@@ -150,7 +174,7 @@ export default function DashboardPage() {
                       <div
                         className="bg-red-500 h-2 rounded-full"
                         style={{
-                          width: `${(disconnectedBeacons / mockBeacons.length) * 100}%`,
+                          width: `${totalBeacons ? (disconnectedBeacons / totalBeacons) * 100 : 0}%`,
                         }}
                       ></div>
                     </div>
@@ -159,7 +183,7 @@ export default function DashboardPage() {
 
                 <div className="mt-6 pt-6 border-t border-slate-200">
                   <div className="text-center">
-                    <p className="text-3xl font-bold text-slate-900">{mockBeacons.length}</p>
+                    <p className="text-3xl font-bold text-slate-900">{totalBeacons}</p>
                     <p className="text-sm text-slate-600 mt-1">Total de Dispositivos</p>
                   </div>
                 </div>
@@ -202,7 +226,7 @@ export default function DashboardPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {mockAlerts.slice(0, 4).map((alert) => {
-                const beacon = mockBeacons.find((b) => b.id === alert.beacon_id);
+                const beacon = beacons.find((b) => b.id === alert.beacon_id);
                 return (
                   <AlertCard
                     key={alert.id}
