@@ -1,8 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import Sidebar from '@/components/Sidebar';
-import Header from '@/components/Header';
+import Navbar from '@/components/Navbar';
 import KPICard from '@/components/KPICard';
 import ChartCard from '@/components/ChartCard';
 import { Play, RefreshCw, TriangleAlert as AlertTriangle, Battery, Activity, Radio } from 'lucide-react';
@@ -156,35 +155,34 @@ export default function SimulationPage() {
     : [];
 
   return (
-    <div className="min-h-screen bg-slate-50">
-      <Sidebar />
-      <div className="ml-64">
-        <Header />
-        <main className="pt-16 p-6">
-          <div className="mb-6">
-            <h1 className="text-2xl font-bold text-slate-900 mb-2">Simulación de Escenarios</h1>
-            <p className="text-slate-600">
+    <div className="min-h-screen bg-[#020617]">
+      <Navbar />
+      <div>
+        <main className="pt-20 p-6 max-w-[1600px] mx-auto">
+          <div className="mb-8">
+            <h1 className="text-3xl font-black text-white mb-2 tracking-tight">Simulación de Escenarios</h1>
+            <p className="text-slate-400 font-medium">
               Prueba diferentes escenarios operativos y analiza predicciones de mantenimiento
             </p>
           </div>
 
-          <div className="bg-white border border-slate-200 rounded-lg shadow-sm p-6 mb-6">
-            <h3 className="text-lg font-semibold text-slate-800 mb-4">
+          <div className="bg-slate-900 border border-white/10 rounded-xl shadow-2xl p-6 mb-8">
+            <h3 className="text-lg font-bold text-white mb-6 uppercase tracking-wider">
               Configuración de Simulación
             </h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">
+                <label className="block text-xs font-black text-slate-400 uppercase tracking-widest mb-3">
                   Seleccionar Dispositivo
                 </label>
                 <select
                   value={selectedBeacon}
                   onChange={(e) => setSelectedBeacon(e.target.value)}
                   disabled={isRunning}
-                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50"
+                  className="w-full px-4 py-2.5 bg-black/30 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all disabled:opacity-30 cursor-pointer"
                 >
                   {beacons.map((beacon) => (
-                    <option key={beacon.id} value={beacon.id}>
+                    <option key={beacon.id} value={beacon.id} className="bg-slate-900">
                       {beacon.name}
                     </option>
                   ))}
@@ -192,17 +190,17 @@ export default function SimulationPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">
+                <label className="block text-xs font-black text-slate-400 uppercase tracking-widest mb-3">
                   Escenario a Simular
                 </label>
                 <select
                   value={selectedScenario}
                   onChange={(e) => setSelectedScenario(e.target.value)}
                   disabled={isRunning}
-                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50"
+                  className="w-full px-4 py-2.5 bg-black/30 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all disabled:opacity-30 cursor-pointer"
                 >
                   {scenarios.map((scenario) => (
-                    <option key={scenario.id} value={scenario.id}>
+                    <option key={scenario.id} value={scenario.id} className="bg-slate-900">
                       {scenario.name}
                     </option>
                   ))}
@@ -210,12 +208,12 @@ export default function SimulationPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">Acciones</label>
+                <label className="block text-xs font-black text-slate-400 uppercase tracking-widest mb-3">Acciones</label>
                 <div className="flex gap-2">
                   <button
                     onClick={runSimulation}
                     disabled={isRunning}
-                    className="flex-1 flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="flex-1 flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-500 text-white px-4 py-2.5 rounded-xl font-bold transition-all shadow-lg shadow-blue-600/20 active:scale-95 disabled:opacity-50"
                   >
                     {isRunning ? (
                       <>
@@ -224,7 +222,7 @@ export default function SimulationPage() {
                       </>
                     ) : (
                       <>
-                        <Play className="w-4 h-4" />
+                        <Play className="w-4 h-4 fill-current" />
                         Ejecutar
                       </>
                     )}
@@ -232,7 +230,7 @@ export default function SimulationPage() {
                   <button
                     onClick={resetSimulation}
                     disabled={!result || isRunning}
-                    className="px-4 py-2 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="px-4 py-2.5 bg-white/5 border border-white/10 text-slate-400 rounded-xl hover:bg-white/10 hover:text-white transition-all disabled:opacity-30 active:scale-95"
                   >
                     <RefreshCw className="w-4 h-4" />
                   </button>
@@ -241,19 +239,19 @@ export default function SimulationPage() {
             </div>
 
             {error && (
-              <div className="mt-4 bg-yellow-50 border border-yellow-200 text-yellow-800 rounded-lg p-4">
+              <div className="mt-6 bg-rose-500/10 border border-rose-500/20 text-rose-400 rounded-xl p-4 font-bold text-sm">
                 {error}
               </div>
             )}
 
             {beacon && (
-              <div className="mt-4 p-4 bg-slate-50 rounded-lg">
-                <p className="text-sm text-slate-600">
-                  <span className="font-semibold">Dispositivo seleccionado:</span> {beacon.name} (
+              <div className="mt-6 p-4 bg-black/40 rounded-xl border border-white/5">
+                <p className="text-xs text-slate-400">
+                  <span className="font-black uppercase tracking-widest text-[10px] text-slate-500 mr-2">Dispositivo:</span> {beacon.name} (
                   {beacon.device_id}) - {beacon.location}
                 </p>
-                <p className="text-sm text-slate-600 mt-1">
-                  <span className="font-semibold">Escenario:</span>{' '}
+                <p className="text-xs text-slate-400 mt-2">
+                  <span className="font-black uppercase tracking-widest text-[10px] text-slate-500 mr-2">Escenario:</span>{' '}
                   {scenarios.find((s) => s.id === selectedScenario)?.description}
                 </p>
               </div>
@@ -334,36 +332,36 @@ export default function SimulationPage() {
                 />
               </div>
 
-              <div className="bg-white border border-slate-200 rounded-lg shadow-sm p-6">
-                <h3 className="text-lg font-semibold text-slate-800 mb-4 flex items-center gap-2">
-                  <AlertTriangle className="w-5 h-5" />
+              <div className="bg-slate-900 border border-white/10 rounded-xl shadow-2xl p-6">
+                <h3 className="text-lg font-bold text-white mb-6 uppercase tracking-wider flex items-center gap-2">
+                  <AlertTriangle className="w-5 h-5 text-amber-500" />
                   Recomendaciones de Mantenimiento
                 </h3>
 
                 <div
-                  className={`mb-4 p-4 rounded-lg ${
+                  className={`mb-6 p-4 rounded-xl border ${
                     result.maintenance_recommended
-                      ? 'bg-yellow-50 border border-yellow-200'
-                      : 'bg-green-50 border border-green-200'
+                      ? 'bg-amber-500/10 border-amber-500/20 text-amber-400'
+                      : 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400'
                   }`}
                 >
-                  <p className="font-semibold text-slate-900">
+                  <p className="font-black uppercase tracking-widest text-xs mb-1">
                     {result.maintenance_recommended
                       ? 'Mantenimiento Requerido'
                       : 'Funcionamiento Normal'}
                   </p>
-                  <p className="text-sm text-slate-600 mt-1">
+                  <p className="text-sm opacity-80">
                     Basado en el escenario simulado: {result.scenario}
                   </p>
                 </div>
 
-                <ul className="space-y-3">
+                <ul className="space-y-4">
                   {result.recommendations.map((recommendation, index) => (
-                    <li key={index} className="flex items-start gap-3">
-                      <span className="flex-shrink-0 w-6 h-6 bg-blue-100 text-blue-700 rounded-full flex items-center justify-center text-sm font-semibold">
+                    <li key={index} className="flex items-start gap-4 group">
+                      <span className="flex-shrink-0 w-6 h-6 bg-blue-600/20 text-blue-400 border border-blue-600/30 rounded-full flex items-center justify-center text-xs font-black shadow-[0_0_10px_rgba(59,130,246,0.2)] group-hover:scale-110 transition-transform">
                         {index + 1}
                       </span>
-                      <p className="text-slate-700">{recommendation}</p>
+                      <p className="text-slate-300 text-sm font-medium leading-relaxed group-hover:text-white transition-colors">{recommendation}</p>
                     </li>
                   ))}
                 </ul>
@@ -372,11 +370,10 @@ export default function SimulationPage() {
           )}
 
           {!result && (
-            <div className="bg-white border border-slate-200 rounded-lg shadow-sm p-12 text-center">
-              <Radio className="w-16 h-16 text-slate-300 mx-auto mb-4" />
-              <p className="text-slate-600">
-                Selecciona un dispositivo y un escenario, luego haz clic en &quot;Ejecutar&quot; para iniciar
-                la simulación
+            <div className="bg-slate-900/50 border border-dashed border-white/10 rounded-2xl p-20 text-center shadow-inner">
+              <Radio className="w-20 h-20 text-slate-700 mx-auto mb-6 animate-pulse" />
+              <p className="text-slate-500 font-bold uppercase tracking-[0.2em] text-xs">
+                Selecciona un dispositivo y un escenario para iniciar la simulación
               </p>
             </div>
           )}

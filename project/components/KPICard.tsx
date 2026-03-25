@@ -35,31 +35,49 @@ export default function KPICard({
   };
 
   const trendColors = {
-    up: 'text-green-600',
-    down: 'text-red-600',
-    stable: 'text-slate-600',
+    up: 'text-emerald-400',
+    down: 'text-rose-400',
+    stable: 'text-slate-500',
   };
 
   const TrendIcon = trend === 'up' ? TrendingUp : trend === 'down' ? TrendingDown : Minus;
 
   return (
-    <div className={`bg-white border ${statusColors[status]} rounded-lg p-6 shadow-sm`}>
-      <div className="flex items-start justify-between">
+    <div className="bg-slate-900 border border-white/10 rounded-xl p-6 shadow-xl relative overflow-hidden group">
+      <div className="flex items-start justify-between relative z-10">
         <div className="flex-1">
-          <p className="text-sm font-medium text-slate-600 mb-1">{title}</p>
-          <p className="text-3xl font-bold text-slate-900 mb-2">{value}</p>
-          {subtitle && <p className="text-xs text-slate-500">{subtitle}</p>}
+          <p className="text-sm font-bold text-slate-400 mb-1 uppercase tracking-wider">{title}</p>
+          <p className="text-3xl font-black text-white mb-2">{value}</p>
+          {subtitle && <p className="text-xs text-slate-500 font-medium">{subtitle}</p>}
           {change !== undefined && (
-            <div className={`flex items-center gap-1 text-sm mt-2 ${trendColors[trend]}`}>
+            <div className={`flex items-center gap-1 text-sm mt-3 ${trendColors[trend]}`}>
               <TrendIcon className="w-4 h-4" />
-              <span className="font-semibold">{Math.abs(change)}%</span>
+              <span className="font-bold">{Math.abs(change)}%</span>
             </div>
           )}
         </div>
-        <div className={`${iconColors[status]} p-3 rounded-lg`}>
-          <Icon className="w-6 h-6" />
+        <div className="p-3 rounded-xl bg-white/5 border border-white/10 shadow-inner group-hover:scale-110 transition-transform duration-300">
+          <Icon className={`w-6 h-6 ${isActiveIconColor(status)}`} />
         </div>
       </div>
+      {/* Background glow effect */}
+      <div className={`absolute -right-4 -bottom-4 w-24 h-24 blur-3xl opacity-10 rounded-full ${bgGlowColors[status]}`}></div>
     </div>
   );
 }
+
+const isActiveIconColor = (status: string) => {
+  switch (status) {
+    case 'success': return 'text-emerald-400';
+    case 'warning': return 'text-amber-400';
+    case 'danger': return 'text-rose-400';
+    default: return 'text-blue-400';
+  }
+};
+
+const bgGlowColors = {
+  success: 'bg-emerald-500',
+  warning: 'bg-amber-500',
+  danger: 'bg-rose-500',
+  info: 'bg-blue-500',
+};

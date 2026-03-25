@@ -30,10 +30,10 @@ export default function DataTable({
 }: DataTableProps) {
   if (loading) {
     return (
-      <div className="bg-white border border-slate-200 rounded-lg shadow-sm">
+      <div className="bg-slate-900 border border-white/10 rounded-xl shadow-2xl">
         <div className="p-12 text-center">
-          <div className="inline-block w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
-          <p className="mt-4 text-slate-600">Cargando datos...</p>
+          <div className="inline-block w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin shadow-[0_0_15px_rgba(59,130,246,0.5)]"></div>
+          <p className="mt-4 text-slate-400 font-bold uppercase tracking-widest text-xs">Cargando datos...</p>
         </div>
       </div>
     );
@@ -41,38 +41,38 @@ export default function DataTable({
 
   if (data.length === 0) {
     return (
-      <div className="bg-white border border-slate-200 rounded-lg shadow-sm">
-        <div className="p-12 text-center">
-          <p className="text-slate-600">{emptyMessage}</p>
+      <div className="bg-slate-900 border border-white/10 rounded-xl shadow-2xl">
+        <div className="p-16 text-center">
+          <p className="text-slate-500 font-bold uppercase tracking-widest text-xs">{emptyMessage}</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="bg-white border border-slate-200 rounded-lg shadow-sm overflow-hidden">
+    <div className="bg-slate-900 border border-white/10 rounded-xl shadow-2xl overflow-hidden">
       <div className="overflow-x-auto">
         <table className="w-full">
-          <thead className="bg-slate-50 border-b border-slate-200">
+          <thead className="bg-white/5 border-b border-white/10">
             <tr>
               {columns.map((column) => (
                 <th
                   key={column.key}
-                  className="px-6 py-3 text-left text-xs font-semibold text-slate-700 uppercase tracking-wider"
+                  className="px-6 py-4 text-left text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]"
                 >
                   {column.label}
                 </th>
               ))}
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-200">
+          <tbody className="divide-y divide-white/5">
             {data.map((row, rowIndex) => (
               <tr
                 key={rowIndex}
-                className="hover:bg-slate-50 transition-colors"
+                className="hover:bg-white/5 transition-all duration-300"
               >
                 {columns.map((column) => (
-                  <td key={column.key} className="px-6 py-4 text-sm text-slate-700">
+                  <td key={column.key} className="px-6 py-4 text-sm text-slate-300 font-medium">
                     {column.render
                       ? column.render(row[column.key], row)
                       : row[column.key]}
@@ -85,22 +85,22 @@ export default function DataTable({
       </div>
 
       {totalPages > 1 && (
-        <div className="flex items-center justify-between px-6 py-4 border-t border-slate-200">
-          <p className="text-sm text-slate-600">
+        <div className="flex items-center justify-between px-6 py-4 border-t border-white/10 bg-black/20">
+          <p className="text-xs font-bold text-slate-500 uppercase tracking-widest">
             Página {currentPage} de {totalPages}
           </p>
           <div className="flex gap-2">
             <button
               onClick={() => onPageChange?.(currentPage - 1)}
               disabled={currentPage === 1}
-              className="px-3 py-1 rounded border border-slate-300 text-slate-700 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="p-2 rounded-lg border border-white/10 text-slate-400 hover:text-white hover:bg-white/5 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
             >
               <ChevronLeft className="w-4 h-4" />
             </button>
             <button
               onClick={() => onPageChange?.(currentPage + 1)}
               disabled={currentPage === totalPages}
-              className="px-3 py-1 rounded border border-slate-300 text-slate-700 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="p-2 rounded-lg border border-white/10 text-slate-400 hover:text-white hover:bg-white/5 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
             >
               <ChevronRight className="w-4 h-4" />
             </button>

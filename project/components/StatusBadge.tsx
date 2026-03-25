@@ -8,28 +8,28 @@ interface StatusBadgeProps {
 export default function StatusBadge({ status, size = 'md' }: StatusBadgeProps) {
   const statusConfig = {
     active: {
-      bg: 'bg-green-100',
-      text: 'text-green-800',
+      bg: 'bg-emerald-500/10',
+      text: 'text-emerald-400',
       label: 'Activo',
-      dot: 'bg-green-500',
+      dot: 'bg-emerald-500',
     },
     inactive: {
-      bg: 'bg-slate-100',
-      text: 'text-slate-800',
+      bg: 'bg-slate-500/10',
+      text: 'text-slate-400',
       label: 'Inactivo',
       dot: 'bg-slate-500',
     },
     disconnected: {
-      bg: 'bg-red-100',
-      text: 'text-red-800',
+      bg: 'bg-rose-500/10',
+      text: 'text-rose-400',
       label: 'Desconectado',
-      dot: 'bg-red-500',
+      dot: 'bg-rose-500',
     },
     maintenance: {
-      bg: 'bg-yellow-100',
-      text: 'text-yellow-800',
+      bg: 'bg-amber-500/10',
+      text: 'text-amber-400',
       label: 'Mantenimiento',
-      dot: 'bg-yellow-500',
+      dot: 'bg-amber-500',
     },
   };
 

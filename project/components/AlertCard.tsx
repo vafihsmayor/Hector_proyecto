@@ -22,36 +22,36 @@ export default function AlertCard({
 }: AlertCardProps) {
   const priorityConfig = {
     low: {
-      bg: 'bg-blue-50',
-      border: 'border-blue-200',
+      bg: 'bg-blue-500/10',
+      border: 'border-blue-500/20',
       icon: Info,
-      iconBg: 'bg-blue-100',
-      iconColor: 'text-blue-600',
-      text: 'text-blue-800',
+      iconBg: 'bg-blue-500/20',
+      iconColor: 'text-blue-400',
+      text: 'text-blue-400',
     },
     medium: {
-      bg: 'bg-yellow-50',
-      border: 'border-yellow-200',
+      bg: 'bg-amber-500/10',
+      border: 'border-amber-500/20',
       icon: AlertCircle,
-      iconBg: 'bg-yellow-100',
-      iconColor: 'text-yellow-600',
-      text: 'text-yellow-800',
+      iconBg: 'bg-amber-500/20',
+      iconColor: 'text-amber-400',
+      text: 'text-amber-400',
     },
     high: {
-      bg: 'bg-orange-50',
-      border: 'border-orange-200',
+      bg: 'bg-orange-500/10',
+      border: 'border-orange-500/20',
       icon: AlertTriangle,
-      iconBg: 'bg-orange-100',
-      iconColor: 'text-orange-600',
-      text: 'text-orange-800',
+      iconBg: 'bg-orange-500/20',
+      iconColor: 'text-orange-400',
+      text: 'text-orange-400',
     },
     critical: {
-      bg: 'bg-red-50',
-      border: 'border-red-200',
+      bg: 'bg-rose-500/10',
+      border: 'border-rose-500/20',
       icon: AlertTriangle,
-      iconBg: 'bg-red-100',
-      iconColor: 'text-red-600',
-      text: 'text-red-800',
+      iconBg: 'bg-rose-500/20',
+      iconColor: 'text-rose-400',
+      text: 'text-rose-400',
     },
   };
 
@@ -59,30 +59,30 @@ export default function AlertCard({
   const Icon = config.icon;
 
   const statusBadge = {
-    active: 'bg-green-100 text-green-800',
-    acknowledged: 'bg-blue-100 text-blue-800',
-    resolved: 'bg-slate-100 text-slate-800',
-    dismissed: 'bg-slate-100 text-slate-500',
+    active: 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/20',
+    acknowledged: 'bg-blue-500/20 text-blue-400 border border-blue-500/20',
+    resolved: 'bg-slate-500/20 text-slate-400 border border-slate-500/20',
+    dismissed: 'bg-slate-500/10 text-slate-500 border border-white/5',
   };
 
   return (
-    <div className={`${config.bg} border ${config.border} rounded-lg p-4`}>
-      <div className="flex items-start gap-3">
-        <div className={`${config.iconBg} p-2 rounded-lg flex-shrink-0`}>
+    <div className={`${config.bg} border ${config.border} rounded-xl p-4 transition-all duration-300 hover:shadow-lg hover:bg-white/5`}>
+      <div className="flex items-start gap-4">
+        <div className={`${config.iconBg} p-2.5 rounded-xl flex-shrink-0 shadow-inner`}>
           <Icon className={`w-5 h-5 ${config.iconColor}`} />
         </div>
 
         <div className="flex-1 min-w-0">
           <div className="flex items-start justify-between gap-2 mb-1">
-            <h4 className={`font-semibold ${config.text}`}>{type}</h4>
-            <span className={`text-xs px-2 py-1 rounded ${statusBadge[status]}`}>
+            <h4 className={`font-bold tracking-tight ${config.text}`}>{type}</h4>
+            <span className={`text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full ${statusBadge[status]}`}>
               {status === 'active' ? 'Activa' : status === 'acknowledged' ? 'Reconocida' : status === 'resolved' ? 'Resuelta' : 'Descartada'}
             </span>
           </div>
 
-          <p className="text-sm text-slate-700 mb-2">{message}</p>
+          <p className="text-sm text-slate-300 mb-3 leading-relaxed">{message}</p>
 
-          <div className="flex items-center justify-between text-xs text-slate-600">
+          <div className="flex items-center justify-between text-[10px] text-slate-500 font-bold uppercase tracking-widest">
             <span className="font-medium">{deviceName}</span>
             <span>{format(new Date(timestamp), 'dd/MM/yyyy HH:mm', { locale: es })}</span>
           </div>

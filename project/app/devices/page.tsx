@@ -3,6 +3,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import Sidebar from '@/components/Sidebar';
 import Header from '@/components/Header';
+import Navbar from '@/components/Navbar';
 import DataTable from '@/components/DataTable';
 import StatusBadge from '@/components/StatusBadge';
 import { Plus, Search, Eye, CreditCard as Edit, Trash2, CircleX as XCircle } from 'lucide-react';
@@ -133,80 +134,79 @@ export default function DevicesPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-slate-50">
-      <Sidebar />
-      <div className="ml-64">
-        <Header />
-        <main className="pt-16 p-6">
-          <div className="mb-6 flex items-center justify-between">
+    <div className="min-h-screen bg-[#020617]">
+      <Navbar />
+      <div>
+        <main className="pt-20 p-6 max-w-[1600px] mx-auto">
+          <div className="mb-8 flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold text-slate-900 mb-2">Gestión de Dispositivos</h1>
-              <p className="text-slate-600">Administración de beacons BLE registrados</p>
+              <h1 className="text-3xl font-black text-white mb-2 tracking-tight">Gestión de Dispositivos</h1>
+              <p className="text-slate-400 font-medium">Administración de beacons BLE registrados</p>
             </div>
             <button 
               onClick={() => setIsModalOpen(true)}
-              className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors"
+              className="group relative flex items-center gap-2 bg-blue-600 hover:bg-blue-500 text-white px-6 py-2.5 rounded-xl font-bold transition-all shadow-[0_0_20px_rgba(59,130,246,0.3)] active:scale-95"
             >
-              <Plus className="w-5 h-5" />
+              <Plus className="w-5 h-5 group-hover:rotate-90 transition-transform" />
               Agregar Dispositivo
             </button>
           </div>
 
           {isModalOpen && (
-            <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-              <div className="bg-white rounded-xl shadow-xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in duration-200">
-                <div className="p-6 border-b border-slate-100 flex items-center justify-between">
-                  <h2 className="text-xl font-bold text-slate-800">Agregar Nuevo Dispositivo</h2>
-                  <button onClick={() => setIsModalOpen(false)} className="text-slate-400 hover:text-slate-600">
+            <div className="fixed inset-0 bg-black/80 backdrop-blur-md z-[100] flex items-center justify-center p-4">
+              <div className="bg-slate-900 border border-white/10 rounded-2xl shadow-2xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in duration-300">
+                <div className="p-6 border-b border-white/10 flex items-center justify-between bg-black/20">
+                  <h2 className="text-xl font-black text-white tracking-tight">Agregar Nuevo Dispositivo</h2>
+                  <button onClick={() => setIsModalOpen(false)} className="text-slate-500 hover:text-white transition-colors">
                     <XCircle className="w-6 h-6" />
                   </button>
                 </div>
-                <form onSubmit={handleCreateDevice} className="p-6 space-y-4">
+                <form onSubmit={handleCreateDevice} className="p-6 space-y-5">
                   <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-1">ID del Dispositivo (MAC/Serial)</label>
+                    <label className="block text-xs font-black text-slate-400 uppercase tracking-widest mb-2">ID del Dispositivo (MAC/Serial)</label>
                     <input
                       required
                       type="text"
                       value={formData.device_id}
                       onChange={(e) => setFormData({ ...formData, device_id: e.target.value })}
                       placeholder="Ej: BE:AC:ON:01:02:03"
-                      className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 transition-all outline-none"
+                      className="w-full px-4 py-2.5 bg-black/30 border border-white/10 rounded-xl text-white focus:ring-2 focus:ring-blue-500 transition-all outline-none placeholder:text-slate-600"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-1">Nombre</label>
+                    <label className="block text-xs font-black text-slate-400 uppercase tracking-widest mb-2">Nombre</label>
                     <input
                       required
                       type="text"
                       value={formData.name}
                       onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                       placeholder="Ej: Beacon Almacén A"
-                      className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 transition-all outline-none"
+                      className="w-full px-4 py-2.5 bg-black/30 border border-white/10 rounded-xl text-white focus:ring-2 focus:ring-blue-500 transition-all outline-none placeholder:text-slate-600"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-1">Ubicación</label>
+                    <label className="block text-xs font-black text-slate-400 uppercase tracking-widest mb-2">Ubicación</label>
                     <input
                       required
                       type="text"
                       value={formData.location}
                       onChange={(e) => setFormData({ ...formData, location: e.target.value })}
                       placeholder="Ej: Pasillo 4, Estante 2"
-                      className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 transition-all outline-none"
+                      className="w-full px-4 py-2.5 bg-black/30 border border-white/10 rounded-xl text-white focus:ring-2 focus:ring-blue-500 transition-all outline-none placeholder:text-slate-600"
                     />
                   </div>
                   <div className="pt-4 flex gap-3">
                     <button
                       type="button"
                       onClick={() => setIsModalOpen(false)}
-                      className="flex-1 px-4 py-2 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors"
+                      className="flex-1 px-4 py-2.5 border border-white/10 text-slate-400 rounded-xl hover:bg-white/5 transition-all font-bold"
                     >
                       Cancelar
                     </button>
                     <button
                       type="submit"
                       disabled={isSubmitting}
-                      className="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-semibold transition-all shadow-md active:scale-95 disabled:opacity-50"
+                      className="flex-1 bg-blue-600 hover:bg-blue-500 text-white px-4 py-2.5 rounded-xl font-bold transition-all shadow-lg active:scale-95 disabled:opacity-50"
                     >
                       {isSubmitting ? 'Guardando...' : 'Guardar Dispositivo'}
                     </button>
@@ -216,16 +216,16 @@ export default function DevicesPage() {
             </div>
           )}
 
-          <div className="bg-white border border-slate-200 rounded-lg shadow-sm p-6 mb-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="bg-slate-900 border border-white/10 rounded-xl shadow-2xl p-6 mb-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500" />
                 <input
                   type="text"
                   placeholder="Buscar por nombre, ID o ubicación..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full pl-10 pr-4 py-2.5 bg-black/30 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all placeholder:text-slate-600"
                 />
               </div>
 
@@ -233,51 +233,53 @@ export default function DevicesPage() {
                 <select
                   value={statusFilter}
                   onChange={(e) => setStatusFilter(e.target.value)}
-                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-2.5 bg-black/30 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all cursor-pointer"
                 >
-                  <option value="all">Todos los estados</option>
-                  <option value="active">Activos</option>
-                  <option value="inactive">Inactivos</option>
-                  <option value="disconnected">Desconectados</option>
-                  <option value="maintenance">En mantenimiento</option>
+                  <option value="all" className="bg-slate-900">Todos los estados</option>
+                  <option value="active" className="bg-slate-900">Activos</option>
+                  <option value="inactive" className="bg-slate-900">Inactivos</option>
+                  <option value="disconnected" className="bg-slate-900">Desconectados</option>
+                  <option value="maintenance" className="bg-slate-900">En mantenimiento</option>
                 </select>
               </div>
             </div>
           </div>
 
           {error && (
-            <div className="mb-6 bg-red-50 border border-red-200 text-red-800 rounded-lg p-4">
+            <div className="mb-6 bg-rose-500/10 border border-rose-500/20 text-rose-400 rounded-xl p-4 font-bold text-sm">
               {error}
             </div>
           )}
 
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-            <div className="bg-white border border-slate-200 rounded-lg p-4">
-              <p className="text-sm text-slate-600 mb-1">Total Dispositivos</p>
-              <p className="text-2xl font-bold text-slate-900">{beacons.length}</p>
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <div className="bg-slate-900 border border-white/10 rounded-xl p-5 shadow-xl">
+              <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2">Total Dispositivos</p>
+              <p className="text-3xl font-black text-white">{beacons.length}</p>
             </div>
-            <div className="bg-white border border-green-200 rounded-lg p-4 bg-green-50">
-              <p className="text-sm text-green-700 mb-1">Activos</p>
-              <p className="text-2xl font-bold text-green-700">
+            <div className="bg-slate-900 border border-emerald-500/20 rounded-xl p-5 shadow-xl relative overflow-hidden group">
+              <p className="text-[10px] font-black uppercase tracking-widest text-emerald-500/60 mb-2">Activos</p>
+              <p className="text-3xl font-black text-emerald-400 relative z-10">
                 {beacons.filter((b) => b.status === 'active').length}
               </p>
+              <div className="absolute -right-2 -bottom-2 w-16 h-16 bg-emerald-500 blur-3xl opacity-5 group-hover:opacity-10 transition-opacity"></div>
             </div>
-            <div className="bg-white border border-slate-200 rounded-lg p-4 bg-slate-50">
-              <p className="text-sm text-slate-700 mb-1">Inactivos</p>
-              <p className="text-2xl font-bold text-slate-700">
+            <div className="bg-slate-900 border border-white/10 rounded-xl p-5 shadow-xl">
+              <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2">Inactivos</p>
+              <p className="text-3xl font-black text-slate-300">
                 {beacons.filter((b) => b.status === 'inactive').length}
               </p>
             </div>
-            <div className="bg-white border border-red-200 rounded-lg p-4 bg-red-50">
-              <p className="text-sm text-red-700 mb-1">Desconectados</p>
-              <p className="text-2xl font-bold text-red-700">
+            <div className="bg-slate-900 border border-rose-500/20 rounded-xl p-5 shadow-xl relative overflow-hidden group">
+              <p className="text-[10px] font-black uppercase tracking-widest text-rose-500/60 mb-2">Desconectados</p>
+              <p className="text-3xl font-black text-rose-400 relative z-10">
                 {beacons.filter((b) => b.status === 'disconnected').length}
               </p>
+              <div className="absolute -right-2 -bottom-2 w-16 h-16 bg-rose-500 blur-3xl opacity-5 group-hover:opacity-10 transition-opacity"></div>
             </div>
           </div>
 
           {isLoading && (
-            <div className="mb-6 text-slate-600">Cargando dispositivos desde backend...</div>
+            <div className="mb-6 text-slate-500 text-xs font-black uppercase tracking-widest animate-pulse">Cargando dispositivos desde backend...</div>
           )}
 
           <DataTable

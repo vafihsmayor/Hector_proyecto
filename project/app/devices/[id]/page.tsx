@@ -2,8 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
-import Sidebar from '@/components/Sidebar';
-import Header from '@/components/Header';
+import Navbar from '@/components/Navbar';
 import StatusBadge from '@/components/StatusBadge';
 import ChartCard from '@/components/ChartCard';
 import KPICard from '@/components/KPICard';
@@ -66,18 +65,18 @@ export default function DeviceDetailPage() {
 
   if (!beacon) {
     return (
-      <div className="min-h-screen bg-slate-50">
-        <Sidebar />
-        <div className="ml-64">
-          <Header />
-          <main className="pt-16 p-6">
-            <div className="bg-white border border-slate-200 rounded-lg p-12 text-center">
-              <p className="text-slate-600">Dispositivo no encontrado</p>
+      <div className="min-h-screen bg-[#020617]">
+        <Navbar />
+        <div>
+          <main className="pt-20 p-6 max-w-[1600px] mx-auto">
+            <div className="bg-slate-900 border border-dashed border-white/10 rounded-2xl p-20 text-center shadow-inner">
+              <Radio className="w-20 h-20 text-slate-700 mx-auto mb-6 animate-pulse" />
+              <p className="text-slate-500 font-bold uppercase tracking-[0.2em] text-xs">Dispositivo no encontrado</p>
               <Link
                 href="/devices"
-                className="inline-block mt-4 text-blue-600 hover:text-blue-700"
+                className="inline-block mt-8 px-6 py-2.5 bg-blue-600 text-white rounded-xl font-bold text-sm shadow-lg shadow-blue-600/20 hover:bg-blue-500 transition-all active:scale-95"
               >
-                Volver a dispositivos
+                Volver al listado
               </Link>
             </div>
           </main>
@@ -101,63 +100,62 @@ export default function DeviceDetailPage() {
   }));
 
   return (
-    <div className="min-h-screen bg-slate-50">
-      <Sidebar />
-      <div className="ml-64">
-        <Header />
-        <main className="pt-16 p-6">
-          <div className="mb-6">
+    <div className="min-h-screen bg-[#020617]">
+      <Navbar />
+      <div>
+        <main className="pt-20 p-6 max-w-[1600px] mx-auto">
+          <div className="mb-8">
             <Link
               href="/devices"
-              className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 mb-4"
+              className="inline-flex items-center gap-2 text-blue-400 hover:text-blue-300 mb-6 font-bold text-xs uppercase tracking-widest transition-colors"
             >
               <ArrowLeft className="w-4 h-4" />
               Volver a dispositivos
             </Link>
-            <div className="flex items-start justify-between">
+            <div className="flex items-end justify-between">
               <div>
-                <h1 className="text-2xl font-bold text-slate-900 mb-2">{beacon.name}</h1>
-                <p className="text-slate-600 font-mono text-sm">{beacon.device_id}</p>
+                <h1 className="text-4xl font-black text-white mb-2 tracking-tight">{beacon.name}</h1>
+                <p className="text-slate-500 font-mono text-sm tracking-wider">{beacon.device_id}</p>
               </div>
               <StatusBadge status={beacon.status} size="lg" />
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-            <div className="bg-white border border-slate-200 rounded-lg p-4">
-              <div className="flex items-center gap-3 mb-2">
-                <MapPin className="w-5 h-5 text-slate-600" />
-                <p className="text-sm font-medium text-slate-600">Ubicación</p>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <div className="bg-slate-900 border border-white/10 rounded-2xl p-5 shadow-xl hover:border-blue-500/30 transition-all group">
+              <div className="flex items-center gap-3 mb-3">
+                <MapPin className="w-5 h-5 text-blue-400 group-hover:scale-110 transition-transform" />
+                <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Ubicación</p>
               </div>
-              <p className="text-base font-semibold text-slate-900">{beacon.location}</p>
+              <p className="text-base font-bold text-white">{beacon.location}</p>
             </div>
 
-            <div className="bg-white border border-slate-200 rounded-lg p-4">
-              <div className="flex items-center gap-3 mb-2">
-                <Radio className="w-5 h-5 text-slate-600" />
-                <p className="text-sm font-medium text-slate-600">Modelo</p>
+            <div className="bg-slate-900 border border-white/10 rounded-2xl p-5 shadow-xl hover:border-blue-500/30 transition-all group">
+              <div className="flex items-center gap-3 mb-3">
+                <Radio className="w-5 h-5 text-purple-400 group-hover:scale-110 transition-transform" />
+                <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Modelo</p>
               </div>
-              <p className="text-base font-semibold text-slate-900">{beacon.model}</p>
+              <p className="text-base font-bold text-white">{beacon.model}</p>
             </div>
 
-            <div className="bg-white border border-slate-200 rounded-lg p-4">
-              <div className="flex items-center gap-3 mb-2">
-                <Calendar className="w-5 h-5 text-slate-600" />
-                <p className="text-sm font-medium text-slate-600">Fecha de Registro</p>
+            <div className="bg-slate-900 border border-white/10 rounded-2xl p-5 shadow-xl hover:border-blue-500/30 transition-all group">
+              <div className="flex items-center gap-3 mb-3">
+                <Calendar className="w-5 h-5 text-emerald-400 group-hover:scale-110 transition-transform" />
+                <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Fecha de Registro</p>
               </div>
-              <p className="text-base font-semibold text-slate-900">
+              <p className="text-base font-bold text-white tabular-nums">
                 {beacon.enrolled_at
                   ? format(new Date(beacon.enrolled_at), 'dd/MM/yyyy', { locale: es })
                   : 'N/A'}
               </p>
             </div>
 
-            <div className="bg-white border border-slate-200 rounded-lg p-4">
-              <div className="flex items-center gap-3 mb-2">
-                <Clock className="w-5 h-5 text-slate-600" />
-                <p className="text-sm font-medium text-slate-600">Última Conexión</p>
+            <div className="bg-slate-900 border border-white/10 rounded-2xl p-5 shadow-xl hover:border-blue-500/30 transition-all group">
+              <div className="flex items-center gap-3 mb-3">
+                <Clock className="w-5 h-5 text-amber-400 group-hover:scale-110 transition-transform" />
+                <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Última Conexión</p>
               </div>
-              <p className="text-base font-semibold text-slate-900">
+              <p className="text-base font-bold text-white tabular-nums">
                 {beacon.last_seen
                   ? format(new Date(beacon.last_seen), 'dd/MM/yyyy HH:mm', { locale: es })
                   : 'N/A'}
@@ -213,27 +211,28 @@ export default function DeviceDetailPage() {
           )}
 
           {devicePrediction && (
-            <div className="bg-white border border-slate-200 rounded-lg p-6 mb-6">
-              <h3 className="text-lg font-semibold text-slate-800 mb-4 flex items-center gap-2">
-                <AlertTriangle className="w-5 h-5" />
-                Predicción de Mantenimiento
+            <div className="bg-slate-900 border border-white/10 rounded-2xl p-6 mb-8 shadow-2xl relative overflow-hidden group">
+              <div className="absolute top-0 right-0 w-64 h-64 bg-blue-600/5 rounded-full blur-3xl -mr-32 -mt-32"></div>
+              <h3 className="text-lg font-bold text-white mb-8 uppercase tracking-wider flex items-center gap-2 relative z-10">
+                <AlertTriangle className="w-5 h-5 text-amber-500" />
+                Predicción de Mantenimiento Inteligente
               </h3>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div>
-                  <p className="text-sm text-slate-600 mb-2">Probabilidad de Falla</p>
-                  <div className="flex items-end gap-2">
-                    <p className="text-3xl font-bold text-slate-900">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8 relative z-10">
+                <div className="p-4 bg-black/40 rounded-2xl border border-white/5">
+                  <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-3">Probabilidad de Falla</p>
+                  <div className="flex items-end gap-3">
+                    <p className="text-4xl font-black text-white tabular-nums">
                       {devicePrediction.failure_probability}%
                     </p>
                     <span
-                      className={`text-sm font-semibold px-2 py-1 rounded ${
+                      className={`text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full mb-1 ${
                         devicePrediction.risk_level === 'critical'
-                          ? 'bg-red-100 text-red-700'
+                          ? 'bg-rose-500/10 text-rose-400 border border-rose-500/20'
                           : devicePrediction.risk_level === 'high'
-                          ? 'bg-orange-100 text-orange-700'
+                          ? 'bg-orange-500/10 text-orange-400 border border-orange-500/20'
                           : devicePrediction.risk_level === 'medium'
-                          ? 'bg-yellow-100 text-yellow-700'
-                          : 'bg-green-100 text-green-700'
+                          ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20'
+                          : 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
                       }`}
                     >
                       {devicePrediction.risk_level === 'critical'
@@ -247,23 +246,23 @@ export default function DeviceDetailPage() {
                   </div>
                 </div>
 
-                <div>
-                  <p className="text-sm text-slate-600 mb-2">Tiempo Estimado de Falla</p>
-                  <p className="text-3xl font-bold text-slate-900">
+                <div className="p-4 bg-black/40 rounded-2xl border border-white/5">
+                  <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-3">Tiempo Estimado</p>
+                  <p className="text-4xl font-black text-white tabular-nums">
                     {devicePrediction.estimated_time_to_fail > 0
                       ? `${devicePrediction.estimated_time_to_fail}h`
                       : 'Inmediata'}
                   </p>
                 </div>
 
-                <div>
-                  <p className="text-sm text-slate-600 mb-2">Recomendación</p>
-                  <p className="text-lg font-semibold text-slate-900">
+                <div className="p-4 bg-black/40 rounded-2xl border border-white/5">
+                  <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-3">Recomendación</p>
+                  <p className="text-lg font-bold text-white leading-tight">
                     {devicePrediction.maintenance_recommended
-                      ? 'Mantenimiento requerido'
-                      : 'Funcionamiento normal'}
+                      ? 'Mantenimiento requerido pronto'
+                      : 'Dispositivo en estado normal'}
                   </p>
-                  <p className="text-sm text-slate-600 mt-1">
+                  <p className="text-[10px] text-slate-500 mt-2 font-black uppercase tracking-widest">
                     Confianza: {(devicePrediction.confidence_score * 100).toFixed(0)}%
                   </p>
                 </div>
@@ -294,32 +293,32 @@ export default function DeviceDetailPage() {
           </div>
 
           {deviceAlerts.length > 0 && (
-            <div className="bg-white border border-slate-200 rounded-lg p-6">
-              <h3 className="text-lg font-semibold text-slate-800 mb-4">
-                Alertas de este Dispositivo
+            <div className="bg-slate-900 border border-white/10 rounded-2xl p-6 shadow-2xl">
+              <h3 className="text-lg font-bold text-white mb-8 uppercase tracking-wider">
+                Historial de Alertas Locales
               </h3>
-              <div className="space-y-3">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {deviceAlerts.map((alert) => (
                   <div
                     key={alert.id}
-                    className="border border-slate-200 rounded-lg p-4 flex items-start justify-between"
+                    className="bg-black/40 border border-white/5 rounded-2xl p-5 flex items-start justify-between group hover:border-blue-500/30 transition-all"
                   >
                     <div>
-                      <p className="font-semibold text-slate-900 mb-1">{alert.type}</p>
-                      <p className="text-sm text-slate-600 mb-2">{alert.message}</p>
-                      <p className="text-xs text-slate-500">
+                      <p className="font-bold text-white mb-1 group-hover:text-blue-400 transition-colors">{alert.type}</p>
+                      <p className="text-xs text-slate-500 mb-4 leading-relaxed line-clamp-2">{alert.message}</p>
+                      <p className="text-[10px] font-black text-slate-600 uppercase tracking-widest tabular-nums">
                         {format(new Date(alert.created_at), 'dd/MM/yyyy HH:mm', { locale: es })}
                       </p>
                     </div>
                     <span
-                      className={`text-xs px-2 py-1 rounded ${
+                      className={`text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full ${
                         alert.priority === 'critical'
-                          ? 'bg-red-100 text-red-700'
+                          ? 'bg-rose-500/10 text-rose-400 border border-rose-500/20'
                           : alert.priority === 'high'
-                          ? 'bg-orange-100 text-orange-700'
+                          ? 'bg-orange-500/10 text-orange-400 border border-orange-500/20'
                           : alert.priority === 'medium'
-                          ? 'bg-yellow-100 text-yellow-700'
-                          : 'bg-blue-100 text-blue-700'
+                          ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20'
+                          : 'bg-blue-500/10 text-blue-400 border border-blue-500/20'
                       }`}
                     >
                       {alert.priority === 'critical'

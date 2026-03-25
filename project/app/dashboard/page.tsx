@@ -1,8 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import Sidebar from '@/components/Sidebar';
-import Header from '@/components/Header';
+import Navbar from '@/components/Navbar';
 import KPICard from '@/components/KPICard';
 import ChartCard from '@/components/ChartCard';
 import AlertCard from '@/components/AlertCard';
@@ -66,14 +65,13 @@ export default function DashboardPage() {
   ).length;
 
   return (
-    <div className="min-h-screen bg-slate-50">
-      <Sidebar />
-      <div className="ml-64">
-        <Header />
-        <main className="pt-16 p-6">
-          <div className="mb-6">
-            <h1 className="text-2xl font-bold text-slate-900 mb-2">Dashboard General</h1>
-            <p className="text-slate-600">
+    <div className="min-h-screen bg-[#020617]">
+      <Navbar />
+      <div>
+        <main className="pt-20 p-6 max-w-[1600px] mx-auto">
+          <div className="mb-8">
+            <h1 className="text-3xl font-black text-white mb-2 tracking-tight">Dashboard General</h1>
+            <p className="text-slate-400 font-medium">
               Monitoreo en tiempo real de dispositivos beacon BLE
             </p>
           </div>
@@ -114,7 +112,7 @@ export default function DashboardPage() {
           </div>
 
           {apiError && (
-            <div className="mb-6 bg-red-50 border border-red-200 text-red-800 rounded-lg p-4">
+            <div className="mb-6 bg-rose-500/10 border border-rose-500/20 text-rose-400 rounded-xl p-4 font-bold text-sm">
               {apiError}
             </div>
           )}
@@ -133,19 +131,19 @@ export default function DashboardPage() {
             </div>
 
             <div>
-              <div className="bg-white border border-slate-200 rounded-lg p-6 shadow-sm h-full">
-                <h3 className="text-lg font-semibold text-slate-800 mb-4">
+              <div className="bg-slate-900 border border-white/10 rounded-xl p-6 shadow-2xl h-full">
+                <h3 className="text-lg font-bold text-white mb-6 uppercase tracking-wider">
                   Estado de Dispositivos
                 </h3>
-                <div className="space-y-4">
+                <div className="space-y-6">
                   <div>
                     <div className="flex items-center justify-between mb-2">
-                      <span className="text-sm font-medium text-slate-700">Activos</span>
-                      <span className="text-sm font-bold text-green-600">{activeBeacons}</span>
+                      <span className="text-xs font-black uppercase tracking-widest text-slate-400">Activos</span>
+                      <span className="text-sm font-black text-emerald-400">{activeBeacons}</span>
                     </div>
-                    <div className="w-full bg-slate-100 rounded-full h-2">
+                    <div className="w-full bg-white/5 rounded-full h-2 shadow-inner">
                       <div
-                        className="bg-green-500 h-2 rounded-full"
+                        className="bg-gradient-to-r from-emerald-600 to-emerald-400 h-2 rounded-full shadow-[0_0_10px_rgba(16,185,129,0.3)]"
                         style={{ width: `${totalBeacons ? (activeBeacons / totalBeacons) * 100 : 0}%` }}
                       ></div>
                     </div>
@@ -153,12 +151,12 @@ export default function DashboardPage() {
 
                   <div>
                     <div className="flex items-center justify-between mb-2">
-                      <span className="text-sm font-medium text-slate-700">Inactivos</span>
-                      <span className="text-sm font-bold text-slate-600">{inactiveBeacons}</span>
+                      <span className="text-xs font-black uppercase tracking-widest text-slate-400">Inactivos</span>
+                      <span className="text-sm font-black text-slate-300">{inactiveBeacons}</span>
                     </div>
-                    <div className="w-full bg-slate-100 rounded-full h-2">
+                    <div className="w-full bg-white/5 rounded-full h-2 shadow-inner">
                       <div
-                        className="bg-slate-400 h-2 rounded-full"
+                        className="bg-slate-600 h-2 rounded-full"
                         style={{ width: `${totalBeacons ? (inactiveBeacons / totalBeacons) * 100 : 0}%` }}
                       ></div>
                     </div>
@@ -166,14 +164,14 @@ export default function DashboardPage() {
 
                   <div>
                     <div className="flex items-center justify-between mb-2">
-                      <span className="text-sm font-medium text-slate-700">Desconectados</span>
-                      <span className="text-sm font-bold text-red-600">
+                      <span className="text-xs font-black uppercase tracking-widest text-slate-400">Desconectados</span>
+                      <span className="text-sm font-black text-rose-400">
                         {disconnectedBeacons}
                       </span>
                     </div>
-                    <div className="w-full bg-slate-100 rounded-full h-2">
+                    <div className="w-full bg-white/5 rounded-full h-2 shadow-inner">
                       <div
-                        className="bg-red-500 h-2 rounded-full"
+                        className="bg-gradient-to-r from-rose-600 to-rose-400 h-2 rounded-full shadow-[0_0_10px_rgba(244,63,94,0.3)]"
                         style={{
                           width: `${totalBeacons ? (disconnectedBeacons / totalBeacons) * 100 : 0}%`,
                         }}
@@ -182,10 +180,10 @@ export default function DashboardPage() {
                   </div>
                 </div>
 
-                <div className="mt-6 pt-6 border-t border-slate-200">
+                <div className="mt-8 pt-8 border-t border-white/10">
                   <div className="text-center">
-                    <p className="text-3xl font-bold text-slate-900">{totalBeacons}</p>
-                    <p className="text-sm text-slate-600 mt-1">Total de Dispositivos</p>
+                    <p className="text-4xl font-black text-white">{totalBeacons}</p>
+                    <p className="text-[10px] text-slate-500 font-black uppercase tracking-[0.2em] mt-2">Total Dispositivos</p>
                   </div>
                 </div>
               </div>
@@ -214,12 +212,12 @@ export default function DashboardPage() {
             />
           </div>
 
-          <div className="bg-white border border-slate-200 rounded-lg p-6 shadow-sm">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-slate-800">Alertas Recientes</h3>
+          <div className="bg-slate-900 border border-white/10 rounded-xl p-6 shadow-2xl">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-lg font-bold text-white uppercase tracking-wider">Alertas Recientes</h3>
               <a
                 href="/alerts"
-                className="text-sm text-blue-600 hover:text-blue-700 font-medium"
+                className="text-xs font-black uppercase tracking-widest text-blue-400 hover:text-blue-300 transition-colors"
               >
                 Ver todas
               </a>
@@ -241,8 +239,8 @@ export default function DashboardPage() {
                 );
               })}
               {alerts.length === 0 && (
-                <div className="col-span-full py-10 text-center bg-slate-50 border border-dashed border-slate-200 rounded-lg">
-                  <p className="text-slate-500 text-sm">No hay alertas activas en este momento.</p>
+                <div className="col-span-full py-12 text-center bg-white/5 border border-dashed border-white/10 rounded-xl">
+                  <p className="text-slate-500 font-bold uppercase tracking-widest text-xs">No hay alertas activas en este momento</p>
                 </div>
               )}
             </div>

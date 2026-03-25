@@ -1,8 +1,7 @@
 'use client';
 
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import Sidebar from '@/components/Sidebar';
-import Header from '@/components/Header';
+import Navbar from '@/components/Navbar';
 import AlertCard from '@/components/AlertCard';
 import DataTable from '@/components/DataTable';
 import { ListFilter as Filter, CircleCheck as CheckCircle, Circle as XCircle } from 'lucide-react';
@@ -75,14 +74,14 @@ export default function AlertsPage() {
       label: 'Prioridad',
       render: (value: string) => (
         <span
-          className={`px-2 py-1 rounded text-xs font-semibold ${
+          className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${
             value === 'critical'
-              ? 'bg-red-100 text-red-700'
+              ? 'bg-rose-500/10 text-rose-400 border border-rose-500/20'
               : value === 'high'
-              ? 'bg-orange-100 text-orange-700'
+              ? 'bg-orange-500/10 text-orange-400 border border-orange-500/20'
               : value === 'medium'
-              ? 'bg-yellow-100 text-yellow-700'
-              : 'bg-blue-100 text-blue-700'
+              ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20'
+              : 'bg-blue-500/10 text-blue-400 border border-blue-500/20'
           }`}
         >
           {value === 'critical'
@@ -98,17 +97,18 @@ export default function AlertsPage() {
     {
       key: 'type',
       label: 'Tipo',
-      render: (value: string) => <span className="font-medium text-slate-900">{value}</span>,
+      render: (value: string) => <span className="font-bold text-white mb-0.5 block">{value}</span>,
     },
     {
       key: 'message',
       label: 'Mensaje',
+      render: (value: string) => <span className="text-slate-400 text-xs leading-relaxed">{value}</span>,
     },
     {
       key: 'beacon_id',
       label: 'Dispositivo',
       render: (value: string) => {
-        return <span className="text-sm text-slate-700">{beaconById.get(value) || 'Desconocido'}</span>;
+        return <span className="text-xs font-bold text-slate-300">{beaconById.get(value) || 'Desconocido'}</span>;
       },
     },
     {
@@ -116,14 +116,14 @@ export default function AlertsPage() {
       label: 'Estado',
       render: (value: string) => (
         <span
-          className={`px-2 py-1 rounded text-xs font-semibold ${
+          className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${
             value === 'active'
-              ? 'bg-green-100 text-green-700'
+              ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
               : value === 'acknowledged'
-              ? 'bg-blue-100 text-blue-700'
+              ? 'bg-blue-500/10 text-blue-400 border border-blue-500/20'
               : value === 'resolved'
-              ? 'bg-slate-100 text-slate-700'
-              : 'bg-slate-100 text-slate-500'
+              ? 'bg-slate-500/10 text-slate-400 border border-white/5'
+              : 'bg-white/5 text-slate-500'
           }`}
         >
           {value === 'active'
@@ -140,7 +140,7 @@ export default function AlertsPage() {
       key: 'created_at',
       label: 'Fecha',
       render: (value: string) => (
-        <span className="text-sm text-slate-600">
+        <span className="text-xs font-bold text-slate-500 tabular-nums">
           {format(new Date(value), 'dd/MM/yyyy HH:mm', { locale: es })}
         </span>
       ),
@@ -174,60 +174,62 @@ export default function AlertsPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-slate-50">
-      <Sidebar />
-      <div className="ml-64">
-        <Header />
-        <main className="pt-16 p-6">
-          <div className="mb-6">
-            <h1 className="text-2xl font-bold text-slate-900 mb-2">Sistema de Alertas</h1>
-            <p className="text-slate-600">
+    <div className="min-h-screen bg-[#020617]">
+      <Navbar />
+      <div>
+        <main className="pt-20 p-6 max-w-[1600px] mx-auto">
+          <div className="mb-8">
+            <h1 className="text-3xl font-black text-white mb-2 tracking-tight">Sistema de Alertas</h1>
+            <p className="text-slate-400 font-medium">
               Monitoreo y gestión de alertas generadas por los dispositivos
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-            <div className="bg-white border border-green-200 rounded-lg p-4 bg-green-50">
-              <p className="text-sm text-green-700 mb-1">Alertas Activas</p>
-              <p className="text-2xl font-bold text-green-700">{activeAlerts}</p>
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <div className="bg-slate-900 border border-emerald-500/20 rounded-xl p-5 shadow-xl relative overflow-hidden group">
+              <p className="text-[10px] font-black uppercase tracking-widest text-emerald-500/60 mb-2">Alertas Activas</p>
+              <p className="text-3xl font-black text-emerald-400 relative z-10">{activeAlerts}</p>
+              <div className="absolute -right-2 -bottom-2 w-16 h-16 bg-emerald-500 blur-3xl opacity-5 group-hover:opacity-10 transition-opacity"></div>
             </div>
-            <div className="bg-white border border-red-200 rounded-lg p-4 bg-red-50">
-              <p className="text-sm text-red-700 mb-1">Críticas</p>
-              <p className="text-2xl font-bold text-red-700">{criticalAlerts}</p>
+            <div className="bg-slate-900 border border-rose-500/20 rounded-xl p-5 shadow-xl relative overflow-hidden group">
+              <p className="text-[10px] font-black uppercase tracking-widest text-rose-500/60 mb-2">Críticas</p>
+              <p className="text-3xl font-black text-rose-400 relative z-10">{criticalAlerts}</p>
+              <div className="absolute -right-2 -bottom-2 w-16 h-16 bg-rose-500 blur-3xl opacity-5 group-hover:opacity-10 transition-opacity"></div>
             </div>
-            <div className="bg-white border border-blue-200 rounded-lg p-4 bg-blue-50">
-              <p className="text-sm text-blue-700 mb-1">Reconocidas</p>
-              <p className="text-2xl font-bold text-blue-700">{acknowledgedAlerts}</p>
+            <div className="bg-slate-900 border border-blue-500/20 rounded-xl p-5 shadow-xl relative overflow-hidden group">
+              <p className="text-[10px] font-black uppercase tracking-widest text-blue-500/60 mb-2">Reconocidas</p>
+              <p className="text-3xl font-black text-blue-400 relative z-10">{acknowledgedAlerts}</p>
+              <div className="absolute -right-2 -bottom-2 w-16 h-16 bg-blue-500 blur-3xl opacity-5 group-hover:opacity-10 transition-opacity"></div>
             </div>
-            <div className="bg-white border border-slate-200 rounded-lg p-4 bg-slate-50">
-              <p className="text-sm text-slate-700 mb-1">Resueltas</p>
-              <p className="text-2xl font-bold text-slate-700">{resolvedAlerts}</p>
+            <div className="bg-slate-900 border border-white/10 rounded-xl p-5 shadow-xl">
+              <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2">Resueltas</p>
+              <p className="text-3xl font-black text-slate-300">{resolvedAlerts}</p>
             </div>
           </div>
 
-          <div className="bg-white border border-slate-200 rounded-lg shadow-sm p-6 mb-6">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-slate-800 flex items-center gap-2">
-                <Filter className="w-5 h-5" />
-                Filtros
+          <div className="bg-slate-900 border border-white/10 rounded-xl shadow-2xl p-6 mb-8">
+            <div className="flex items-center justify-between mb-8">
+              <h3 className="text-lg font-bold text-white uppercase tracking-wider flex items-center gap-2">
+                <Filter className="w-5 h-5 text-blue-400" />
+                Filtros de Búsqueda
               </h3>
-              <div className="flex gap-2">
+              <div className="flex gap-2 bg-black/40 p-1.5 rounded-xl border border-white/5 shadow-inner">
                 <button
                   onClick={() => setViewMode('cards')}
-                  className={`px-4 py-2 rounded-lg transition-colors ${
+                  className={`px-5 py-2 rounded-lg text-xs font-black uppercase tracking-widest transition-all ${
                     viewMode === 'cards'
-                      ? 'bg-blue-600 text-white'
-                      : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                      ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/20'
+                      : 'text-slate-500 hover:text-slate-300'
                   }`}
                 >
                   Tarjetas
                 </button>
                 <button
                   onClick={() => setViewMode('table')}
-                  className={`px-4 py-2 rounded-lg transition-colors ${
+                  className={`px-5 py-2 rounded-lg text-xs font-black uppercase tracking-widest transition-all ${
                     viewMode === 'table'
-                      ? 'bg-blue-600 text-white'
-                      : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                      ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/20'
+                      : 'text-slate-500 hover:text-slate-300'
                   }`}
                 >
                   Tabla
@@ -235,34 +237,34 @@ export default function AlertsPage() {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">Prioridad</label>
+                <label className="block text-xs font-black text-slate-400 uppercase tracking-widest mb-3">Prioridad</label>
                 <select
                   value={priorityFilter}
                   onChange={(e) => setPriorityFilter(e.target.value)}
-                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-2.5 bg-black/30 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all cursor-pointer"
                 >
-                  <option value="all">Todas las prioridades</option>
-                  <option value="critical">Crítica</option>
-                  <option value="high">Alta</option>
-                  <option value="medium">Media</option>
-                  <option value="low">Baja</option>
+                  <option value="all" className="bg-slate-900">Todas las prioridades</option>
+                  <option value="critical" className="bg-slate-900">Crítica</option>
+                  <option value="high" className="bg-slate-900">Alta</option>
+                  <option value="medium" className="bg-slate-900">Media</option>
+                  <option value="low" className="bg-slate-900">Baja</option>
                 </select>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">Estado</label>
+                <label className="block text-xs font-black text-slate-400 uppercase tracking-widest mb-3">Estado</label>
                 <select
                   value={statusFilter}
                   onChange={(e) => setStatusFilter(e.target.value)}
-                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-2.5 bg-black/30 border border-white/10 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all cursor-pointer"
                 >
-                  <option value="all">Todos los estados</option>
-                  <option value="active">Activas</option>
-                  <option value="acknowledged">Reconocidas</option>
-                  <option value="resolved">Resueltas</option>
-                  <option value="dismissed">Descartadas</option>
+                  <option value="all" className="bg-slate-900">Todos los estados</option>
+                  <option value="active" className="bg-slate-900">Activas</option>
+                  <option value="acknowledged" className="bg-slate-900">Reconocidas</option>
+                  <option value="resolved" className="bg-slate-900">Resueltas</option>
+                  <option value="dismissed" className="bg-slate-900">Descartadas</option>
                 </select>
               </div>
             </div>
@@ -275,9 +277,9 @@ export default function AlertsPage() {
           )}
 
           {isLoading ? (
-            <div className="flex flex-col items-center justify-center py-20 grayscale opacity-50">
-              <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mb-4"></div>
-              <p className="text-slate-600">Cargando alertas...</p>
+            <div className="flex flex-col items-center justify-center py-24 bg-slate-900 border border-white/10 rounded-xl shadow-2xl">
+              <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mb-6 shadow-[0_0_15px_rgba(59,130,246,0.3)]"></div>
+              <p className="text-slate-400 font-bold uppercase tracking-widest text-xs">Cargando alertas...</p>
             </div>
           ) : viewMode === 'cards' ? (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -295,8 +297,8 @@ export default function AlertsPage() {
                 );
               })}
               {alerts.length === 0 && (
-                <div className="col-span-full py-20 text-center bg-white border border-dashed border-slate-300 rounded-xl">
-                  <p className="text-slate-500">No se encontraron alertas para este filtro.</p>
+                <div className="col-span-full py-24 text-center bg-white/5 border border-dashed border-white/10 rounded-2xl">
+                  <p className="text-slate-500 font-bold uppercase tracking-widest text-xs">No se encontraron alertas para este filtro</p>
                 </div>
               )}
             </div>
