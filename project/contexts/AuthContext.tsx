@@ -37,22 +37,30 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const login = async (username: string, password: string) => {
     try {
-      const mockUser: User = {
-        id: '1',
-        username: username,
-        email: `${username}@beaconmonitor.com`,
-        role: 'admin'
-      };
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ username, password }),
+      });
 
-      const mockToken = 'mock-jwt-token-' + Date.now();
+      const data = await response.json();
 
-      localStorage.setItem('user', JSON.stringify(mockUser));
-      localStorage.setItem('token', mockToken);
+      if (!response.ok) {
+        throw new Error(data.error || 'Credenciales inválidas');
+      }
 
-      setUser(mockUser);
+      const { user, token } = data;
+
+      localStorage.setItem('user', JSON.stringify(user));
+      localStorage.setItem('token', token);
+
+      setUser(user);
       router.push('/dashboard');
-    } catch (error) {
-      throw new Error('Invalid credentials');
+    } catch (error: any) {
+      console.error('Login error:', error);
+      throw error;
     }
   };
 
