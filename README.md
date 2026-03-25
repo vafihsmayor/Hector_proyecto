@@ -75,6 +75,20 @@ El sistema actualmente utiliza autenticación simulada:
 
 ---
 
+# Beacon Monitor - Mantenimiento Predictivo
+
+## 🎯 PROPÓSITO DEL SISTEMA
+
+El propósito del sistema es proporcionar una plataforma web que permita el monitoreo en tiempo real, análisis histórico y predicción de fallas en dispositivos beacon BLE, facilitando la toma de decisiones para mantenimiento preventivo y predictivo, con el fin de mejorar la disponibilidad, eficiencia y vida útil de los dispositivos.
+
+### 🧠 ¿Para qué sirve?
+- **Monitorear**: Ver cómo están funcionando los dispositivos (beacons) en tiempo real.
+- **Predecir**: Detectar problemas antes de que ocurran mediante análisis de batería, uso y señal.
+- **Analizar**: Revisar historiales y generar alertas inteligentes.
+- **Simular**: Probar escenarios de falla para optimizar la toma de decisiones.
+
+---
+
 ## 📁 Estructura del proyecto
 
 ```

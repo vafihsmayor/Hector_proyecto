@@ -7,7 +7,7 @@ import KPICard from '@/components/KPICard';
 import ChartCard from '@/components/ChartCard';
 import AlertCard from '@/components/AlertCard';
 import { Battery, Radio, Activity, TriangleAlert as AlertTriangle, TrendingUp, Clock } from 'lucide-react';
-import { getBeacons, getDashboardSummary, type DashboardSummary } from '@/lib/api';
+import { getBeacons, getDashboardSummary, getAlerts, type DashboardSummary } from '@/lib/api';
 import type { Beacon } from '@/lib/types';
 import {
   mockAlerts,
@@ -19,6 +19,7 @@ import {
 
 export default function DashboardPage() {
   const [beacons, setBeacons] = useState<Beacon[]>([]);
+  const [alerts, setAlerts] = useState<any[]>([]);
   const [summary, setSummary] = useState<DashboardSummary | null>(null);
   const [apiError, setApiError] = useState('');
   const [batteryData, setBatteryData] = useState<any[]>([]);
@@ -29,12 +30,14 @@ export default function DashboardPage() {
     const loadData = async () => {
       setApiError('');
       try {
-        const [summaryResponse, beaconsResponse] = await Promise.all([
+        const [summaryResponse, beaconsResponse, alertsResponse] = await Promise.all([
           getDashboardSummary(),
           getBeacons(),
+          getAlerts('all', 'active'),
         ]);
         setSummary(summaryResponse);
         setBeacons(beaconsResponse);
+        setAlerts(alertsResponse);
       } catch (err: any) {
         setApiError(err?.message || 'No se pudo cargar el resumen del dashboard');
       }
@@ -53,10 +56,8 @@ export default function DashboardPage() {
     summary?.disconnected_beacons ?? beacons.filter((b) => b.status === 'disconnected').length;
   const totalBeacons = summary?.total_beacons ?? beacons.length;
 
-  const activeAlerts = mockAlerts.filter((a) => a.status === 'active').length;
-  const criticalAlerts = mockAlerts.filter(
-    (a) => a.status === 'active' && a.priority === 'critical'
-  ).length;
+  const activeAlerts = summary?.active_alerts ?? 0;
+  const criticalAlerts = alerts.filter((a) => a.priority === 'critical').length;
 
   const avgBattery = summary?.avg_battery ?? 0;
 
@@ -225,8 +226,8 @@ export default function DashboardPage() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {mockAlerts.slice(0, 4).map((alert) => {
-                const beacon = beacons.find((b) => b.id === alert.beacon_id);
+              {alerts.slice(0, 4).map((alert) => {
+                const beacon = beacons.find((b) => b.id === alert.beacon);
                 return (
                   <AlertCard
                     key={alert.id}
@@ -239,6 +240,11 @@ export default function DashboardPage() {
                   />
                 );
               })}
+              {alerts.length === 0 && (
+                <div className="col-span-full py-10 text-center bg-slate-50 border border-dashed border-slate-200 rounded-lg">
+                  <p className="text-slate-500 text-sm">No hay alertas activas en este momento.</p>
+                </div>
+              )}
             </div>
           </div>
         </main>

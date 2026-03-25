@@ -5,9 +5,9 @@ import Sidebar from '@/components/Sidebar';
 import Header from '@/components/Header';
 import DataTable from '@/components/DataTable';
 import StatusBadge from '@/components/StatusBadge';
-import { Plus, Search, Eye, CreditCard as Edit, Trash2 } from 'lucide-react';
+import { Plus, Search, Eye, CreditCard as Edit, Trash2, CircleX as XCircle } from 'lucide-react';
 import type { Beacon } from '@/lib/types';
-import { getBeacons } from '@/lib/api';
+import { getBeacons, createBeacon } from '@/lib/api';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 import Link from 'next/link';
@@ -15,26 +15,51 @@ import Link from 'next/link';
 export default function DevicesPage() {
   const [beacons, setBeacons] = useState<Beacon[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
+  
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [formData, setFormData] = useState({
+    device_id: '',
+    name: '',
+    model: 'Beacon v1',
+    location: '',
+  });
+
+  const loadBeacons = async () => {
+    setIsLoading(true);
+    setError('');
+    try {
+      const data = await getBeacons();
+      setBeacons(data);
+    } catch (err: any) {
+      setError(err?.message || 'No se pudo cargar la lista de beacons');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const loadBeacons = async () => {
-      setIsLoading(true);
-      setError('');
-      try {
-        const data = await getBeacons();
-        setBeacons(data);
-      } catch (err: any) {
-        setError(err?.message || 'No se pudo cargar la lista de beacons');
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
     loadBeacons();
   }, []);
+
+  const handleCreateDevice = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    setError('');
+    try {
+      await createBeacon(formData);
+      setIsModalOpen(false);
+      setFormData({ device_id: '', name: '', model: 'Beacon v1', location: '' });
+      loadBeacons();
+    } catch (err: any) {
+      setError(err?.message || 'Error al crear el dispositivo');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   const filteredBeacons = useMemo(() => beacons.filter((beacon) => {
     const matchesSearch =
@@ -118,11 +143,78 @@ export default function DevicesPage() {
               <h1 className="text-2xl font-bold text-slate-900 mb-2">Gestión de Dispositivos</h1>
               <p className="text-slate-600">Administración de beacons BLE registrados</p>
             </div>
-            <button className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors">
+            <button 
+              onClick={() => setIsModalOpen(true)}
+              className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors"
+            >
               <Plus className="w-5 h-5" />
               Agregar Dispositivo
             </button>
           </div>
+
+          {isModalOpen && (
+            <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+              <div className="bg-white rounded-xl shadow-xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in duration-200">
+                <div className="p-6 border-b border-slate-100 flex items-center justify-between">
+                  <h2 className="text-xl font-bold text-slate-800">Agregar Nuevo Dispositivo</h2>
+                  <button onClick={() => setIsModalOpen(false)} className="text-slate-400 hover:text-slate-600">
+                    <XCircle className="w-6 h-6" />
+                  </button>
+                </div>
+                <form onSubmit={handleCreateDevice} className="p-6 space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-1">ID del Dispositivo (MAC/Serial)</label>
+                    <input
+                      required
+                      type="text"
+                      value={formData.device_id}
+                      onChange={(e) => setFormData({ ...formData, device_id: e.target.value })}
+                      placeholder="Ej: BE:AC:ON:01:02:03"
+                      className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 transition-all outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-1">Nombre</label>
+                    <input
+                      required
+                      type="text"
+                      value={formData.name}
+                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                      placeholder="Ej: Beacon Almacén A"
+                      className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 transition-all outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-1">Ubicación</label>
+                    <input
+                      required
+                      type="text"
+                      value={formData.location}
+                      onChange={(e) => setFormData({ ...formData, location: e.target.value })}
+                      placeholder="Ej: Pasillo 4, Estante 2"
+                      className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 transition-all outline-none"
+                    />
+                  </div>
+                  <div className="pt-4 flex gap-3">
+                    <button
+                      type="button"
+                      onClick={() => setIsModalOpen(false)}
+                      className="flex-1 px-4 py-2 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors"
+                    >
+                      Cancelar
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={isSubmitting}
+                      className="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-semibold transition-all shadow-md active:scale-95 disabled:opacity-50"
+                    >
+                      {isSubmitting ? 'Guardando...' : 'Guardar Dispositivo'}
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          )}
 
           <div className="bg-white border border-slate-200 rounded-lg shadow-sm p-6 mb-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

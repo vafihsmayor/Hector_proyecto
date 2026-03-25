@@ -1,47 +1,72 @@
 'use client';
 
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import Sidebar from '@/components/Sidebar';
 import Header from '@/components/Header';
 import AlertCard from '@/components/AlertCard';
 import DataTable from '@/components/DataTable';
 import { ListFilter as Filter, CircleCheck as CheckCircle, Circle as XCircle } from 'lucide-react';
-import { mockAlerts } from '@/lib/mockData';
+import { getAlerts, updateAlertStatus } from '@/lib/api';
 import { useBeacons } from '@/lib/useBeacons';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 
 export default function AlertsPage() {
-  const { beacons, error } = useBeacons();
+  const { beacons, error: beaconError } = useBeacons();
+  const [alerts, setAlerts] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  
   const [priorityFilter, setPriorityFilter] = useState<string>('all');
-    const beaconById = useMemo(() => {
-      const map = new Map<string, string>();
-      beacons.forEach((beacon) => map.set(beacon.id, beacon.name));
-      return map;
-    }, [beacons]);
-
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [viewMode, setViewMode] = useState<'cards' | 'table'>('cards');
 
-  const filteredAlerts = mockAlerts.filter((alert) => {
-    const matchesPriority = priorityFilter === 'all' || alert.priority === priorityFilter;
-    const matchesStatus = statusFilter === 'all' || alert.status === statusFilter;
-    return matchesPriority && matchesStatus;
-  });
+  const beaconById = useMemo(() => {
+    const map = new Map<string, string>();
+    beacons.forEach((beacon) => map.set(beacon.id, beacon.name));
+    return map;
+  }, [beacons]);
 
-  const activeAlerts = mockAlerts.filter((a) => a.status === 'active').length;
-  const criticalAlerts = mockAlerts.filter(
-    (a) => a.status === 'active' && a.priority === 'critical'
-  ).length;
-  const acknowledgedAlerts = mockAlerts.filter((a) => a.status === 'acknowledged').length;
-  const resolvedAlerts = mockAlerts.filter((a) => a.status === 'resolved').length;
-
-  const handleAcknowledge = (alertId: string) => {
-    alert(`Alerta ${alertId} reconocida (funcionalidad en desarrollo)`);
+  const fetchAlerts = async () => {
+    setIsLoading(true);
+    try {
+      const data = await getAlerts(priorityFilter, statusFilter);
+      setAlerts(data);
+      setError(null);
+    } catch (err: any) {
+      setError(err.message || 'Error al cargar las alertas');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handleResolve = (alertId: string) => {
-    alert(`Alerta ${alertId} resuelta (funcionalidad en desarrollo)`);
+  useEffect(() => {
+    fetchAlerts();
+  }, [priorityFilter, statusFilter]);
+
+  const activeAlerts = alerts.filter((a) => a.status === 'active').length;
+  const criticalAlerts = alerts.filter(
+    (a) => a.status === 'active' && a.priority === 'critical'
+  ).length;
+  const acknowledgedAlerts = alerts.filter((a) => a.status === 'acknowledged').length;
+  const resolvedAlerts = alerts.filter((a) => a.status === 'resolved').length;
+
+  const handleAcknowledge = async (alertId: string) => {
+    try {
+      await updateAlertStatus(alertId, 'acknowledge');
+      fetchAlerts();
+    } catch (err: any) {
+      alert(err.message);
+    }
+  };
+
+  const handleResolve = async (alertId: string) => {
+    try {
+      await updateAlertStatus(alertId, 'resolve');
+      fetchAlerts();
+    } catch (err: any) {
+      alert(err.message);
+    }
   };
 
   const columns = [
@@ -244,31 +269,41 @@ export default function AlertsPage() {
           </div>
 
           {error && (
-            <div className="mb-6 bg-yellow-50 border border-yellow-200 text-yellow-800 rounded-lg p-4">
+            <div className="mb-6 bg-red-50 border border-red-200 text-red-800 rounded-lg p-4">
               {error}
             </div>
           )}
 
-          {viewMode === 'cards' ? (
+          {isLoading ? (
+            <div className="flex flex-col items-center justify-center py-20 grayscale opacity-50">
+              <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mb-4"></div>
+              <p className="text-slate-600">Cargando alertas...</p>
+            </div>
+          ) : viewMode === 'cards' ? (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {filteredAlerts.map((alert) => {
+              {alerts.map((alert) => {
                 return (
                   <AlertCard
                     key={alert.id}
                     type={alert.type}
                     priority={alert.priority}
                     message={alert.message}
-                    deviceName={beaconById.get(alert.beacon_id) || 'Dispositivo desconocido'}
+                    deviceName={beaconById.get(alert.beacon) || 'Dispositivo desconocido'}
                     timestamp={alert.created_at}
                     status={alert.status}
                   />
                 );
               })}
+              {alerts.length === 0 && (
+                <div className="col-span-full py-20 text-center bg-white border border-dashed border-slate-300 rounded-xl">
+                  <p className="text-slate-500">No se encontraron alertas para este filtro.</p>
+                </div>
+              )}
             </div>
           ) : (
             <DataTable
               columns={columns}
-              data={filteredAlerts}
+              data={alerts}
               emptyMessage="No se encontraron alertas que coincidan con los filtros"
             />
           )}
