@@ -38,7 +38,7 @@ export default function LoginPage() {
             <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-600 rounded-xl mb-4">
               <Radio className="w-8 h-8 text-white" />
             </div>
-            <h1 className="text-2xl font-bold text-slate-900 mb-2">Beacon Monitor</h1>
+            <h1 className="text-2xl font-bold text-slate-900 mb-2">Monitoreo</h1>
             <p className="text-slate-600">Sistema de Monitoreo y Mantenimiento Predictivo</p>
           </div>
 
@@ -114,13 +114,7 @@ export default function LoginPage() {
             </button>
           </form>
 
-          <div className="mt-6 p-4 bg-blue-50 rounded-lg">
-            <p className="text-xs text-slate-600 text-center">
-              <span className="font-semibold">Credenciales de prueba:</span>
-              <br />
-              Usuario: admin | Contraseña: admin123
-            </p>
-          </div>
+
         </div>
 
         <p className="text-center text-slate-400 text-sm mt-6">

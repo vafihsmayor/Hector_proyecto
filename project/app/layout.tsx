@@ -6,7 +6,7 @@ import { AuthProvider } from '@/contexts/AuthContext';
 const outfit = Outfit({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'Beacon Monitor - Mantenimiento Predictivo',
+  title: 'Monitoreo - Mantenimiento Predictivo',
   description: 'Sistema de monitoreo y mantenimiento predictivo para dispositivos beacon BLE',
 };
 

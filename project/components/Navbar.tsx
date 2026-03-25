@@ -45,9 +45,9 @@ export default function Navbar() {
             </div>
             <div className="hidden lg:block ml-1">
               <h1 className="text-xl font-black leading-none tracking-tight text-white bg-clip-text text-transparent bg-gradient-to-r from-white to-slate-400">
-                BEACON <span className="text-blue-500">PRO</span>
+                Monitoreo <span className="text-blue-500">Hector</span>
               </h1>
-              <p className="text-[10px] text-blue-400/80 font-bold uppercase tracking-[0.2em]">Predictive AI</p>
+              <p className="text-[10px] text-blue-400/80 font-bold uppercase tracking-[0.2em]">Predicccion</p>
             </div>
           </div>
 

@@ -28,7 +28,7 @@ export default function Sidebar() {
             <Radio className="w-6 h-6" />
           </div>
           <div>
-            <h1 className="text-lg font-bold">Beacon Monitor</h1>
+            <h1 className="text-lg font-bold">Monitoreo</h1>
             <p className="text-xs text-slate-400">Mantenimiento Predictivo</p>
           </div>
         </div>

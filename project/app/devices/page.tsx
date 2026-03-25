@@ -78,17 +78,18 @@ export default function DevicesPage() {
       key: 'device_id',
       label: 'ID Dispositivo',
       render: (value: string) => (
-        <span className="font-mono text-sm font-semibold text-slate-900">{value}</span>
+        <span className="font-mono text-xs font-bold text-white tracking-wider">{value}</span>
       ),
     },
     {
       key: 'name',
       label: 'Nombre',
-      render: (value: string) => <span className="font-medium text-slate-900">{value}</span>,
+      render: (value: string) => <span className="font-bold text-white mb-1 block">{value}</span>,
     },
     {
       key: 'location',
       label: 'Ubicación',
+      render: (value: string) => <span className="text-slate-400 font-medium">{value}</span>,
     },
     {
       key: 'status',
@@ -99,7 +100,7 @@ export default function DevicesPage() {
       key: 'last_seen',
       label: 'Última Conexión',
       render: (value: string) => (
-        <span className="text-sm text-slate-600">
+        <span className="text-[11px] font-black text-slate-500 uppercase tracking-widest tabular-nums">
           {format(new Date(value), 'dd/MM/yyyy HH:mm', { locale: es })}
         </span>
       ),
@@ -111,19 +112,19 @@ export default function DevicesPage() {
         <div className="flex items-center gap-2">
           <Link
             href={`/devices/${row.id}`}
-            className="p-2 text-blue-600 hover:bg-blue-50 rounded transition-colors"
+            className="p-2 text-blue-400 hover:bg-blue-500/10 rounded-xl transition-all"
             title="Ver detalles"
           >
             <Eye className="w-4 h-4" />
           </Link>
           <button
-            className="p-2 text-slate-600 hover:bg-slate-100 rounded transition-colors"
+            className="p-2 text-slate-400 hover:bg-white/5 rounded-xl transition-all"
             title="Editar"
           >
             <Edit className="w-4 h-4" />
           </button>
           <button
-            className="p-2 text-red-600 hover:bg-red-50 rounded transition-colors"
+            className="p-2 text-rose-400 hover:bg-rose-500/10 rounded-xl transition-all"
             title="Eliminar"
           >
             <Trash2 className="w-4 h-4" />

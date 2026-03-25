@@ -153,7 +153,7 @@ export default function AlertsPage() {
           {row.status === 'active' && (
             <button
               onClick={() => handleAcknowledge(row.id)}
-              className="p-2 text-blue-600 hover:bg-blue-50 rounded transition-colors"
+              className="p-2 text-blue-400 hover:bg-blue-500/10 rounded-xl transition-all"
               title="Reconocer"
             >
               <CheckCircle className="w-4 h-4" />
@@ -162,7 +162,7 @@ export default function AlertsPage() {
           {(row.status === 'active' || row.status === 'acknowledged') && (
             <button
               onClick={() => handleResolve(row.id)}
-              className="p-2 text-green-600 hover:bg-green-50 rounded transition-colors"
+              className="p-2 text-emerald-400 hover:bg-emerald-500/10 rounded-xl transition-all"
               title="Resolver"
             >
               <XCircle className="w-4 h-4" />
