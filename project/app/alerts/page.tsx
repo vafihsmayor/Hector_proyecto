@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import Sidebar from '@/components/Sidebar';
 import Header from '@/components/Header';
 import AlertCard from '@/components/AlertCard';
@@ -27,7 +27,7 @@ export default function AlertsPage() {
     return map;
   }, [beacons]);
 
-  const fetchAlerts = async () => {
+  const fetchAlerts = useCallback(async () => {
     setIsLoading(true);
     try {
       const data = await getAlerts(priorityFilter, statusFilter);
@@ -38,11 +38,11 @@ export default function AlertsPage() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [priorityFilter, statusFilter]);
 
   useEffect(() => {
     fetchAlerts();
-  }, [priorityFilter, statusFilter]);
+  }, [fetchAlerts]);
 
   const activeAlerts = alerts.filter((a) => a.status === 'active').length;
   const criticalAlerts = alerts.filter(

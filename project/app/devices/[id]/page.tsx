@@ -23,6 +23,16 @@ export default function DeviceDetailPage() {
 
   const [metrics, setMetrics] = useState<any[]>([]);
 
+  const toValidBattery = (value: unknown): number | null => {
+    const parsed = Number(value);
+    return Number.isFinite(parsed) && parsed >= 0 && parsed <= 100 ? parsed : null;
+  };
+
+  const toValidSignal = (value: unknown): number => {
+    const parsed = Number(value);
+    return Number.isFinite(parsed) ? parsed : 0;
+  };
+
   useEffect(() => {
     const loadMetrics = async () => {
       if (!beaconId) {
@@ -35,8 +45,8 @@ export default function DeviceDetailPage() {
         setMetrics(
           orderedAsc.map((item) => ({
             ...item,
-            battery_level: Number(item.battery_level ?? 0),
-            signal_strength: Number(item.signal_strength ?? 0),
+            battery_level: toValidBattery(item.battery_level),
+            signal_strength: toValidSignal(item.signal_strength),
             temperature: 25,
             usage_time: 0,
           }))
@@ -47,6 +57,11 @@ export default function DeviceDetailPage() {
     };
 
     loadMetrics();
+    const intervalId = window.setInterval(loadMetrics, 15000);
+
+    return () => {
+      window.clearInterval(intervalId);
+    };
   }, [beaconId]);
 
   if (!beacon) {
@@ -76,12 +91,12 @@ export default function DeviceDetailPage() {
   const devicePrediction = mockPredictions.find((p) => p.beacon_id === beaconId);
 
   const batteryChartData = metrics.map((m) => ({
-    date: format(new Date(m.timestamp), 'dd MMM', { locale: es }),
+    date: format(new Date(m.timestamp), 'dd/MM HH:mm', { locale: es }),
     battery: m.battery_level,
   }));
 
   const signalChartData = metrics.map((m) => ({
-    date: format(new Date(m.timestamp), 'dd MMM', { locale: es }),
+    date: format(new Date(m.timestamp), 'dd/MM HH:mm', { locale: es }),
     signal: m.signal_strength,
   }));
 
@@ -154,15 +169,22 @@ export default function DeviceDetailPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
               <KPICard
                 title="Nivel de Batería"
-                value={`${latestMetric.battery_level.toFixed(1)}%`}
+                value={
+                  latestMetric.battery_level === null
+                    ? 'N/D'
+                    : `${latestMetric.battery_level.toFixed(1)}%`
+                }
                 icon={Battery}
                 status={
-                  latestMetric.battery_level > 50
+                  latestMetric.battery_level === null
+                    ? 'info'
+                    : latestMetric.battery_level > 50
                     ? 'success'
                     : latestMetric.battery_level > 20
                     ? 'warning'
                     : 'danger'
                 }
+                subtitle={latestMetric.battery_level === null ? 'Sin lectura GATT' : undefined}
               />
 
               <KPICard

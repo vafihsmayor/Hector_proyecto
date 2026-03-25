@@ -1,5 +1,5 @@
 import React from 'react';
-import { Video as LucideIcon, TrendingUp, TrendingDown, Minus } from 'lucide-react';
+import { Video, TrendingUp, TrendingDown, Minus, type LucideIcon } from 'lucide-react';
 
 interface KPICardProps {
   title: string;
