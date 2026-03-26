@@ -32,14 +32,25 @@ jobs:
         working-directory: project
         env:
           NEXT_PUBLIC_API_URL: https://backend-hector-h0hnbnfmgyadgxhu.canadacentral-01.azurewebsites.net
-          # Durante el build, Next.js necesita la URL para inyectarla en el código del cliente
 
       - name: Prepare standalone artifact
         run: |
           mkdir release
-          cp -r project/.next/standalone/* release/
-          cp -r project/.next/static release/.next/static
-          cp -r project/public release/public
+          # Copiar el contenido del standalone
+          cp -rv project/.next/standalone/. release/
+          
+          # Si Next.js anidó el código dentro de una subcarpeta 'project' (debido a tu estructura), lo movemos a la raíz
+          if [ -d "release/project" ]; then
+            echo "Flattening project structure..."
+            cp -rv release/project/. release/
+            rm -rf release/project
+          fi
+          
+          # Copiar los estáticos y la carpeta public al lugar que espera el standalone
+          # Estructura final esperada por el standalone server.js
+          mkdir -p release/.next/static
+          cp -rv project/.next/static/. release/.next/static/
+          cp -rv project/public/. release/public/
           
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
