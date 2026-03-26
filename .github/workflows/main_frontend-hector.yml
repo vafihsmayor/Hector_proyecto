@@ -21,14 +21,13 @@ jobs:
       - name: Set up Node.js version
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
           cache: 'npm'
           cache-dependency-path: project/package-lock.json
 
       - name: npm install, build, and test
         run: |
           cd project
-          # Aumentar memoria para el build si es necesario
           export NODE_OPTIONS="--max-old-space-size=4096"
           npm install
           npm run build --if-present
@@ -40,7 +39,7 @@ jobs:
         run: |
           mkdir release
           
-          # Copiar el contenido de standalone (generado por output: 'standalone')
+          # 1. Copiar el contenido de standalone (incluye server.js y node_modules)
           if [ -d "project/.next/standalone" ]; then
             cp -rv project/.next/standalone/. release/
           else
@@ -48,13 +47,20 @@ jobs:
             exit 1
           fi
           
-          # Copiar archivos estáticos y públicos
+          # 2. Copiar archivos estáticos y públicos
+          # Los ponemos en la subcarpeta del proyecto (donde server.js los busca)
           mkdir -p release/project/.next/static
           cp -rv project/.next/static/. release/project/.next/static/
           
           mkdir -p release/project/public
           cp -rv project/public/. release/project/public/
           
+          # 3. Copiar metadatos críticos (.next/BUILD_ID) a la raíz para evitar el error ENOENT
+          mkdir -p release/.next
+          if [ -f "project/.next/BUILD_ID" ]; then
+            cp -v project/.next/BUILD_ID release/.next/BUILD_ID
+          fi
+
           echo "Final check of release folder structure:"
           ls -R release/
           
@@ -108,6 +114,11 @@ jobs:
                 {
                     "name": "PORT",
                     "value": "8080",
+                    "slotSetting": false
+                },
+                {
+                    "name": "HOSTNAME",
+                    "value": "0.0.0.0",
                     "slotSetting": false
                 }
             ]
