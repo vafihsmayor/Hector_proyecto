@@ -36,21 +36,20 @@ jobs:
       - name: Prepare standalone artifact
         run: |
           mkdir release
-          # Copiar el contenido del standalone
+          
+          # 1. Copiar el contenido de standalone (incluyendo node_modules y server.js)
           cp -rv project/.next/standalone/. release/
           
-          # Si Next.js anidó el código dentro de una subcarpeta 'project' (debido a tu estructura), lo movemos a la raíz
-          if [ -d "release/project" ]; then
-            echo "Flattening project structure..."
-            cp -rv release/project/. release/
-            rm -rf release/project
-          fi
-          
-          # Copiar los estáticos y la carpeta public al lugar que espera el standalone
-          # Estructura final esperada por el standalone server.js
+          # 2. STATIC: Copiar archivos estáticos al lugar que espera standalone
+          # NOTA: Para proyectos en subcarpetas, standalone espera .next/static en la raíz o dentro del proyecto
           mkdir -p release/.next/static
           cp -rv project/.next/static/. release/.next/static/
+          
+          # 3. PUBLIC: Copiar la carpeta public a la raíz de release
           cp -rv project/public/. release/public/
+          
+          echo "Final check of release folder structure:"
+          ls -R release/
           
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
