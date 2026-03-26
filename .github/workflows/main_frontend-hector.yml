@@ -40,13 +40,21 @@ jobs:
           # 1. Copiar el contenido de standalone (incluyendo node_modules y server.js)
           cp -rv project/.next/standalone/. release/
           
-          # 2. STATIC: Copiar archivos estáticos al lugar que espera standalone
-          # NOTA: Para proyectos en subcarpetas, standalone espera .next/static en la raíz o dentro del proyecto
+          # 2. STATIC/PUBLIC: Copiar archivos estáticos y públicos
+          # Los copiamos a la raíz Y a la subcarpeta 'project' para asegurar compatibilidad total
           mkdir -p release/.next/static
           cp -rv project/.next/static/. release/.next/static/
           
-          # 3. PUBLIC: Copiar la carpeta public a la raíz de release
+          mkdir -p release/public
           cp -rv project/public/. release/public/
+          
+          # Copia redundante dentro de la subcarpeta 'project' por si server.js usa dir: 'project'
+          if [ -d "release/project" ]; then
+            mkdir -p release/project/.next/static
+            cp -rv project/.next/static/. release/project/.next/static/
+            mkdir -p release/project/public
+            cp -rv project/public/. release/project/public/
+          fi
           
           echo "Final check of release folder structure:"
           ls -R release/
