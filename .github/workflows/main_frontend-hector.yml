@@ -37,27 +37,26 @@ jobs:
         run: |
           mkdir release
           
-          # 1. Copiar el contenido de standalone (incluyendo node_modules y server.js)
+          # 1. Copiar el contenido de standalone
+          # standalone ya contiene server.js, node_modules y la carpeta del proyecto
           cp -rv project/.next/standalone/. release/
           
-          # 2. STATIC/PUBLIC: Copiar archivos estáticos y públicos
-          # Los copiamos a la raíz Y a la subcarpeta 'project' para asegurar compatibilidad total
+          # 2. Copiar archivos estáticos y públicos (Next.js standalone los requiere fuera)
+          # Los ponemos en la subcarpeta 'project' que es donde server.js los busca si se construyó en esa carpeta
+          mkdir -p release/project/.next/static
+          cp -rv project/.next/static/. release/project/.next/static/
+          
+          mkdir -p release/project/public
+          cp -rv project/public/. release/project/public/
+          
+          # 3. También por seguridad en la raíz (por si se ejecuta con cwd diferente)
           mkdir -p release/.next/static
           cp -rv project/.next/static/. release/.next/static/
-          
           mkdir -p release/public
           cp -rv project/public/. release/public/
-          
-          # Copia redundante dentro de la subcarpeta 'project' por si server.js usa dir: 'project'
-          if [ -d "release/project" ]; then
-            mkdir -p release/project/.next/static
-            cp -rv project/.next/static/. release/project/.next/static/
-            mkdir -p release/project/public
-            cp -rv project/public/. release/project/public/
-          fi
-          
+
           echo "Final check of release folder structure:"
-          ls -R release/
+          ls -F release/
           
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
@@ -92,3 +91,22 @@ jobs:
           app-name: 'frontend-hector'
           slot-name: 'Production'
           package: ./release
+          startup-command: 'node server.js'
+          app-settings-json: |
+            [
+                {
+                    "name": "SCM_DO_BUILD_DURING_DEPLOYMENT",
+                    "value": "false",
+                    "slotSetting": false
+                },
+                {
+                    "name": "NODE_ENV",
+                    "value": "production",
+                    "slotSetting": false
+                },
+                {
+                    "name": "HOSTNAME",
+                    "value": "0.0.0.0",
+                    "slotSetting": false
+                }
+            ]
