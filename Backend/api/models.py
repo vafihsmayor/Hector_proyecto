@@ -2,19 +2,37 @@ import uuid
 from django.db import models
 
 
-class UserAccount(models.Model):
-	id = models.UUIDField(primary_key=True, default=uuid.uuid4)
-	username = models.TextField(unique=True)
-	email = models.TextField(unique=True)
-	password_hash = models.TextField()
-	role = models.TextField()
-	is_active = models.BooleanField(default=True)
-	created_at = models.DateTimeField(auto_now_add=True)
-	updated_at = models.DateTimeField(auto_now=True)
+from django.contrib.auth.hashers import make_password, check_password
 
-	class Meta:
-		managed = False
-		db_table = "users"
+
+class UserAccount(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4)
+    username = models.CharField(max_length=255, unique=True)
+    email = models.EmailField(unique=True)
+    password_hash = models.TextField(db_column="password_hash")
+    role = models.TextField(default="viewer")
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    # Required for JWT for_user(user) compatibility
+    @property
+    def is_authenticated(self):
+        return True
+
+    def set_password(self, raw_password):
+        self.password_hash = make_password(raw_password)
+
+    def check_password(self, raw_password):
+        return check_password(raw_password, self.password_hash)
+
+    # SimpleJWT needs this
+    def __str__(self):
+        return self.username
+
+    class Meta:
+        managed = False
+        db_table = "users"
 
 
 class Alert(models.Model):

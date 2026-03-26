@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { loginRequest } from '@/lib/api';
+import { loginRequest } from '../lib/api';
 
 interface User {
   id: string;
@@ -39,6 +39,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const login = async (username: string, password: string) => {
     try {
       const response = await loginRequest(username, password);
+      // response: { access, refresh, user }
       const authUser: User = {
         id: response.user.id,
         username: response.user.username,
@@ -47,7 +48,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       };
 
       localStorage.setItem('user', JSON.stringify(authUser));
-      localStorage.setItem('token', response.token);
+      localStorage.setItem('token', response.access);
+      localStorage.setItem('refreshToken', response.refresh);
 
       setUser(authUser);
       router.push('/dashboard');
@@ -59,6 +61,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const logout = () => {
     localStorage.removeItem('user');
     localStorage.removeItem('token');
+    localStorage.removeItem('refreshToken');
     setUser(null);
     router.push('/login');
   };

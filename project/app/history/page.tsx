@@ -4,8 +4,8 @@ import React, { useEffect, useState } from 'react';
 import Sidebar from '@/components/Sidebar';
 import Navbar from '@/components/Navbar';
 import ChartCard from '@/components/ChartCard';
-import { Download, Calendar } from 'lucide-react';
-import { getBeaconMetrics } from '@/lib/api';
+import { Download, Calendar, Filter, ChevronRight, Activity, Battery, Signal } from 'lucide-react';
+import { getBeaconMetrics, downloadFile } from '@/lib/api';
 import { useBeacons } from '@/lib/useBeacons';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
@@ -68,8 +68,15 @@ export default function HistoryPage() {
     temperature: '#ef4444',
   };
 
-  const handleExport = () => {
-    alert('Exportación de datos en desarrollo');
+  const handleExport = async (format: 'pdf' | 'excel') => {
+    if (!selectedBeacon) return;
+    const fileName = `historico_${selectedBeacon}_${new Date().toISOString().split('T')[0]}.${format}`;
+    const endpoint = `/api/beacons/${selectedBeacon}/export/${format}/?days=${dateRange}`;
+    try {
+      await downloadFile(endpoint, fileName);
+    } catch (err) {
+      alert('Error al descargar el reporte');
+    }
   };
 
   return (
@@ -150,14 +157,25 @@ export default function HistoryPage() {
               </div>
 
               <div>
-                <label className="block text-xs font-black text-slate-400 uppercase tracking-widest mb-3">Acciones</label>
-                <button
-                  onClick={handleExport}
-                  className="w-full flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-500 text-white px-4 py-2.5 rounded-xl font-bold transition-all shadow-lg active:scale-95"
-                >
-                  <Download className="w-4 h-4" />
-                  Exportar
-                </button>
+                <label className="block text-xs font-black text-slate-400 uppercase tracking-widest mb-3">Reportes</label>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => handleExport('pdf')}
+                    className="flex-1 flex items-center justify-center gap-2 bg-rose-600 hover:bg-rose-500 text-white px-3 py-2.5 rounded-xl font-bold transition-all shadow-lg active:scale-95 text-sm"
+                    title="Exportar a PDF"
+                  >
+                    <Download className="w-4 h-4" />
+                    PDF
+                  </button>
+                  <button
+                    onClick={() => handleExport('excel')}
+                    className="flex-1 flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-2.5 rounded-xl font-bold transition-all shadow-lg active:scale-95 text-sm"
+                    title="Exportar a Excel"
+                  >
+                    <Download className="w-4 h-4" />
+                    Excel
+                  </button>
+                </div>
               </div>
             </div>
           </div>

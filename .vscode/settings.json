@@ -1,0 +1,16 @@
+{
+    "sqltools.connections": [
+        {
+            "ssh": "Disabled",
+            "previewLimit": 50,
+            "server": "server-hector.postgres.database.azure.com",
+            "port": 5432,
+            "driver": "PostgreSQL",
+            "name": "prueba",
+            "group": "prueba",
+            "database": "postgres",
+            "username": "Administrador",
+            "password": "Password2026*"
+        }
+    ]
+}

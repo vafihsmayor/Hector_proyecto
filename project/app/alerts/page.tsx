@@ -5,12 +5,14 @@ import Navbar from '@/components/Navbar';
 import AlertCard from '@/components/AlertCard';
 import DataTable from '@/components/DataTable';
 import { ListFilter as Filter, CircleCheck as CheckCircle, Circle as XCircle } from 'lucide-react';
-import { getAlerts, updateAlertStatus } from '@/lib/api';
+import { getAlerts, updateAlertStatus } from '../../lib/api';
 import { useBeacons } from '@/lib/useBeacons';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
+import { useAuth } from '@/contexts/AuthContext';
 
 export default function AlertsPage() {
+  const { user } = useAuth();
   const { beacons, error: beaconError } = useBeacons();
   const [alerts, setAlerts] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -19,6 +21,8 @@ export default function AlertsPage() {
   const [priorityFilter, setPriorityFilter] = useState<string>('all');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [viewMode, setViewMode] = useState<'cards' | 'table'>('cards');
+
+  const isAdmin = user?.role === 'admin';
 
   const beaconById = useMemo(() => {
     const map = new Map<string, string>();
@@ -150,24 +154,29 @@ export default function AlertsPage() {
       label: 'Acciones',
       render: (_: any, row: any) => (
         <div className="flex items-center gap-2">
-          {row.status === 'active' && (
-            <button
-              onClick={() => handleAcknowledge(row.id)}
-              className="p-2 text-blue-400 hover:bg-blue-500/10 rounded-xl transition-all"
-              title="Reconocer"
-            >
-              <CheckCircle className="w-4 h-4" />
-            </button>
+          {isAdmin && (
+            <>
+              {row.status === 'active' && (
+                <button
+                  onClick={() => handleAcknowledge(row.id)}
+                  className="p-2 text-blue-400 hover:bg-blue-500/10 rounded-xl transition-all"
+                  title="Reconocer"
+                >
+                  <CheckCircle className="w-4 h-4" />
+                </button>
+              )}
+              {(row.status === 'active' || row.status === 'acknowledged') && (
+                <button
+                  onClick={() => handleResolve(row.id)}
+                  className="p-2 text-emerald-400 hover:bg-emerald-500/10 rounded-xl transition-all"
+                  title="Resolver"
+                >
+                  <XCircle className="w-4 h-4" />
+                </button>
+              )}
+            </>
           )}
-          {(row.status === 'active' || row.status === 'acknowledged') && (
-            <button
-              onClick={() => handleResolve(row.id)}
-              className="p-2 text-emerald-400 hover:bg-emerald-500/10 rounded-xl transition-all"
-              title="Resolver"
-            >
-              <XCircle className="w-4 h-4" />
-            </button>
-          )}
+          {!isAdmin && <span className="text-[10px] text-slate-500 font-bold uppercase tracking-widest px-2">Lectura</span>}
         </div>
       ),
     },

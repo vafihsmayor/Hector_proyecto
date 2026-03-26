@@ -2,6 +2,7 @@ import './globals.css';
 import type { Metadata } from 'next';
 import { Outfit } from 'next/font/google';
 import { AuthProvider } from '@/contexts/AuthContext';
+import AuthGuard from '@/components/AuthGuard';
 
 const outfit = Outfit({ subsets: ['latin'] });
 
@@ -16,9 +17,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="es">
+    <html lang="es" className="dark">
       <body className={outfit.className}>
-        <AuthProvider>{children}</AuthProvider>
+        <AuthProvider>
+          <AuthGuard>{children}</AuthGuard>
+        </AuthProvider>
       </body>
     </html>
   );

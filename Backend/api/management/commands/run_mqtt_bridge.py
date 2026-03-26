@@ -10,7 +10,11 @@ from django.db import IntegrityError
 from django.utils import timezone
 from django.utils.dateparse import parse_datetime
 
-from api.models import Beacon, Metric
+from api.models import Alert, Beacon, Metric
+import threading
+import time
+from django.db import connection
+
 
 
 def to_decimal(value):
@@ -141,7 +145,46 @@ class Command(BaseCommand):
         qos = int(os.getenv("MQTT_QOS", "0"))
         device_id_map = load_device_id_map(os.getenv("MQTT_DEVICE_ID_MAP", ""))
 
+        def check_inactivity():
+            """Background task to detect devices that haven't reported in > 30 minutes."""
+            self.stdout.write(self.style.NOTICE("Iniciando monitor de inactividad (Drop Detection)..."))
+            while True:
+                try:
+                    # Closing old connections to avoid database errors in long-running threads
+                    connection.close()
+                    
+                    threshold = timezone.now() - timezone.timedelta(minutes=30)
+                    inactive_beacons = Beacon.objects.filter(
+                        last_seen__lt=threshold,
+                        status="active"
+                    )
+
+                    for beacon in inactive_beacons:
+                        # Check if an active 'device_offline' alert already exists
+                        if not Alert.objects.filter(beacon=beacon, type="device_offline", status="active").exists():
+                            Alert.objects.create(
+                                beacon=beacon,
+                                type="device_offline",
+                                priority="critical",
+                                message=f"Dispositivo {beacon.device_id} sin reporte por más de 30 minutos.",
+                                status="active"
+                            )
+                            beacon.status = "disconnected"
+                            beacon.save(update_fields=["status", "updated_at"])
+                            self.stdout.write(
+                                self.style.WARNING(f"ALERT: Dispositivo {beacon.device_id} marcado como OFFLINE.")
+                            )
+                except Exception as e:
+                    self.stderr.write(self.style.ERROR(f"Error en monitor de inactividad: {e}"))
+                
+                time.sleep(300)  # Check every 5 minutes
+
+        # Start inactivity monitor thread
+        monitor_thread = threading.Thread(target=check_inactivity, daemon=True)
+        monitor_thread.start()
+
         client_id = f"django-mqtt-bridge-{os.getpid()}"
+
         client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2, client_id=client_id)
 
         if username:
@@ -213,7 +256,6 @@ class Command(BaseCommand):
                     .first()
                 )
                 battery = latest_valid["battery_level"] if latest_valid else None
-
             event_timestamp = parse_payload_timestamp(payload.get("timestamp") or payload.get("timestamp_dispositivo"))
 
             try:
@@ -231,7 +273,43 @@ class Command(BaseCommand):
                 )
                 return
 
+            # --- Generación de Alertas Inteligentes ---
+            
+            # 1. Alerta de Batería Baja (< 15%)
+            if battery is not None and battery < 15:
+                if not Alert.objects.filter(beacon=beacon, type="low_battery", status="active").exists():
+                    Alert.objects.create(
+                        beacon=beacon,
+                        type="low_battery",
+                        priority="high",
+                        message=f"Batería baja detectada: {battery}%",
+                        status="active"
+                    )
+                    self.stdout.write(self.style.WARNING(f"ALERT: Batería baja para {resolved_device_id}"))
+
+            # 2. Alerta de Señal Débil (RSSI < -85 dBm en las últimas 3 lecturas)
+            if signal is not None and signal < -85:
+                # Obtenemos las últimas 2 métricas (más la actual que ya está en DB o a punto de estarlo)
+                # Para evitar problemas de carrera, contamos métricas con señal baja
+                recent_signals = Metric.objects.filter(beacon=beacon).order_by("-timestamp")[:2]
+                low_signal_count = 1  # La actual es < -85
+                for s in recent_signals:
+                    if s.signal_strength and s.signal_strength < -85:
+                        low_signal_count += 1
+                
+                if low_signal_count >= 3:
+                    if not Alert.objects.filter(beacon=beacon, type="low_signal", status="active").exists():
+                        Alert.objects.create(
+                            beacon=beacon,
+                            type="low_signal",
+                            priority="medium",
+                            message=f"Señal débil persistente detectada: {signal} dBm",
+                            status="active"
+                        )
+                        self.stdout.write(self.style.WARNING(f"ALERT: Señal débil persistente para {resolved_device_id}"))
+
             beacon.last_seen = timezone.now()
+
             beacon.status = "active"
             beacon.save(update_fields=["last_seen", "status", "updated_at"])
 

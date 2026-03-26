@@ -8,19 +8,23 @@ import DataTable from '@/components/DataTable';
 import StatusBadge from '@/components/StatusBadge';
 import { Plus, Search, Eye, CreditCard as Edit, Trash2, CircleX as XCircle } from 'lucide-react';
 import type { Beacon } from '@/lib/types';
-import { getBeacons, createBeacon } from '@/lib/api';
+import { getBeacons, createBeacon } from '../../lib/api';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 import Link from 'next/link';
+import { useAuth } from '@/contexts/AuthContext';
 
 export default function DevicesPage() {
+  const { user } = useAuth();
   const [beacons, setBeacons] = useState<Beacon[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
-  
+
+  const isAdmin = user?.role === 'admin';
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [formData, setFormData] = useState({
     device_id: '',
@@ -117,18 +121,22 @@ export default function DevicesPage() {
           >
             <Eye className="w-4 h-4" />
           </Link>
-          <button
-            className="p-2 text-slate-400 hover:bg-white/5 rounded-xl transition-all"
-            title="Editar"
-          >
-            <Edit className="w-4 h-4" />
-          </button>
-          <button
-            className="p-2 text-rose-400 hover:bg-rose-500/10 rounded-xl transition-all"
-            title="Eliminar"
-          >
-            <Trash2 className="w-4 h-4" />
-          </button>
+          {isAdmin && (
+            <>
+              <button
+                className="p-2 text-slate-400 hover:bg-white/5 rounded-xl transition-all"
+                title="Editar"
+              >
+                <Edit className="w-4 h-4" />
+              </button>
+              <button
+                className="p-2 text-rose-400 hover:bg-rose-500/10 rounded-xl transition-all"
+                title="Eliminar"
+              >
+                <Trash2 className="w-4 h-4" />
+              </button>
+            </>
+          )}
         </div>
       ),
     },
@@ -144,13 +152,15 @@ export default function DevicesPage() {
               <h1 className="text-3xl font-black text-white mb-2 tracking-tight">Gestión de Dispositivos</h1>
               <p className="text-slate-400 font-medium">Administración de beacons BLE registrados</p>
             </div>
-            <button 
-              onClick={() => setIsModalOpen(true)}
-              className="group relative flex items-center gap-2 bg-blue-600 hover:bg-blue-500 text-white px-6 py-2.5 rounded-xl font-bold transition-all shadow-[0_0_20px_rgba(59,130,246,0.3)] active:scale-95"
-            >
-              <Plus className="w-5 h-5 group-hover:rotate-90 transition-transform" />
-              Agregar Dispositivo
-            </button>
+            {isAdmin && (
+              <button
+                onClick={() => setIsModalOpen(true)}
+                className="group relative flex items-center gap-2 bg-blue-600 hover:bg-blue-500 text-white px-6 py-2.5 rounded-xl font-bold transition-all shadow-[0_0_20px_rgba(59,130,246,0.3)] active:scale-95"
+              >
+                <Plus className="w-5 h-5 group-hover:rotate-90 transition-transform" />
+                Agregar Dispositivo
+              </button>
+            )}
           </div>
 
           {isModalOpen && (

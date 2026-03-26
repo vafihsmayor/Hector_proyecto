@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import Navbar from '@/components/Navbar';
 import { FileText, Download, Calendar } from 'lucide-react';
 import { useBeacons } from '@/lib/useBeacons';
+import { downloadFile } from '@/lib/api';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 
@@ -25,20 +26,27 @@ export default function ReportsPage() {
     { id: 'failures', name: 'Registro de Fallas', description: 'Historial de fallas registradas' },
   ];
 
-  const handleGenerateReport = (fileType: 'excel' | 'pdf') => {
+  const handleGenerateReport = async (fileType: 'excel' | 'pdf') => {
     setIsGenerating(true);
+    
+    let endpoint = '';
+    const reportName = reportTypes.find((r) => r.id === reportType)?.name || 'Reporte';
+    const beaconName = selectedBeacon === 'all' ? 'Todos' : beacons.find((b) => b.id === selectedBeacon)?.name;
+    const fileName = `${reportName}_${beaconName}_${format(new Date(), 'yyyyMMdd')}.${fileType}`;
 
-    setTimeout(() => {
-      const reportName = reportTypes.find((r) => r.id === reportType)?.name || 'Reporte';
-      const beaconName = selectedBeacon === 'all' ? 'Todos' : beacons.find((b) => b.id === selectedBeacon)?.name;
-      const fileName = `${reportName}_${beaconName}_${format(new Date(), 'yyyyMMdd')}.${fileType}`;
-
-      alert(
-        `Generando reporte: ${fileName}\n\nFuncionalidad en desarrollo.\n\nEste reporte incluiría:\n- Período: ${format(new Date(startDate), 'dd/MM/yyyy', { locale: es })} - ${format(new Date(endDate), 'dd/MM/yyyy', { locale: es })}\n- Tipo: ${reportName}\n- Dispositivos: ${beaconName}`
-      );
-
+    if (selectedBeacon === 'all') {
+      endpoint = `/api/beacons/export/${fileType}/?days=30`;
+    } else {
+      endpoint = `/api/beacons/${selectedBeacon}/export/${fileType}/?days=30`;
+    }
+    
+    try {
+      await downloadFile(endpoint, fileName);
+    } catch (err) {
+      alert('Error al generar el reporte');
+    } finally {
       setIsGenerating(false);
-    }, 2000);
+    }
   };
 
   return (
