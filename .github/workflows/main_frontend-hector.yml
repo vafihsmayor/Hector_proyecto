@@ -27,9 +27,9 @@ jobs:
 
       - name: npm install and build
         run: |
+          cd project
           npm install
           npm run build
-        working-directory: project
         env:
           NEXT_PUBLIC_API_URL: https://backend-hector-h0hnbnfmgyadgxhu.canadacentral-01.azurewebsites.net
 
