@@ -65,7 +65,7 @@ class LoginView(APIView):
 
 
 class BeaconListView(APIView):
-	permission_classes = [IsAdminOrReadOnly]
+	permission_classes = [permissions.AllowAny]
 	def get(self, request):
 		queryset = Beacon.objects.all().order_by("-created_at")
 		return Response(BeaconSerializer(queryset, many=True).data)
@@ -79,6 +79,7 @@ class BeaconListView(APIView):
 
 
 class BeaconDetailView(APIView):
+	permission_classes = [permissions.AllowAny]
 	def get(self, request, beacon_id):
 		beacon = Beacon.objects.filter(id=beacon_id).first()
 		if not beacon:
@@ -87,6 +88,7 @@ class BeaconDetailView(APIView):
 
 
 class BeaconMetricsView(APIView):
+	permission_classes = [permissions.AllowAny]
 	def get(self, request, beacon_id):
 		limit = request.query_params.get("limit")
 		days = request.query_params.get("days")
@@ -104,6 +106,7 @@ class BeaconMetricsView(APIView):
 
 
 class AlertListView(APIView):
+    permission_classes = [permissions.AllowAny]
     def get(self, request):
         priority = request.query_params.get("priority")
         status_filter = request.query_params.get("status")
@@ -137,6 +140,7 @@ class AlertActionView(APIView):
 
 
 class DashboardSummaryView(APIView):
+	permission_classes = [permissions.AllowAny]
 	def get(self, request):
 		latest_battery_subquery = (
 			Metric.objects.filter(beacon_id=OuterRef("pk")).order_by("-timestamp").values("battery_level")[:1]
@@ -151,6 +155,13 @@ class DashboardSummaryView(APIView):
 
 		avg_battery = beacons_with_latest_battery.aggregate(avg=Avg("latest_battery"))["avg"]
 
+		active_alerts_count = 0
+		try:
+			active_alerts_count = Alert.objects.filter(status="active").count()
+		except Exception:
+			# Alerts table might not exist in all environments
+			active_alerts_count = 0
+
 		payload = {
 			"total_beacons": Beacon.objects.count(),
 			"active_beacons": status_map.get("active", 0),
@@ -158,13 +169,14 @@ class DashboardSummaryView(APIView):
 			"disconnected_beacons": status_map.get("disconnected", 0),
 			"maintenance_beacons": status_map.get("maintenance", 0),
 			"avg_battery": float(avg_battery) if avg_battery is not None else 0,
-			"active_alerts": Alert.objects.filter(status="active").count(),
+			"active_alerts": active_alerts_count,
 		}
 
 		return Response(payload)
 
 
 class BeaconExportExcelView(APIView):
+    permission_classes = [permissions.AllowAny]
     def get(self, request, beacon_id):
         beacon = Beacon.objects.filter(id=beacon_id).first()
         if not beacon:
@@ -201,6 +213,7 @@ class BeaconExportExcelView(APIView):
 
 
 class BeaconExportPDFView(APIView):
+    permission_classes = [permissions.AllowAny]
     def get(self, request, beacon_id):
         beacon = Beacon.objects.filter(id=beacon_id).first()
         if not beacon:
@@ -255,6 +268,7 @@ class BeaconExportPDFView(APIView):
 
 
 class GlobalExportExcelView(APIView):
+    permission_classes = [permissions.AllowAny]
     def get(self, request):
         days = request.query_params.get("days", "30")
         queryset = Metric.objects.all().order_by("-timestamp")
